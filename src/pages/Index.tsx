@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import SpinWheel, { CloudProvider } from '@/components/SpinWheel';
 import CloudProviderResult from '@/components/CloudProviderResult';
+import ProjectTracker from '@/components/ProjectTracker';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -83,6 +85,9 @@ const Index = () => {
           )
         )}
       </motion.div>
+      
+      {/* Project Tracker section - always visible */}
+      <ProjectTracker providers={CLOUD_PROVIDERS} />
       
       <motion.footer 
         className="mt-auto pt-8 pb-4 text-center text-sm text-muted-foreground"
