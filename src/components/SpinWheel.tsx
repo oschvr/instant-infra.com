@@ -55,9 +55,9 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ providers, onSpinEnd, className }
   };
   
   return (
-    <div className={cn("relative mx-auto", className)}>
+    <div className={cn("relative mx-auto flex flex-col items-center", className)}>
       {/* Indicator */}
-      <div className="indicator animate-pulse-subtle"></div>
+      <div className="indicator animate-pulse-subtle bg-primary"></div>
       
       {/* Wheel */}
       <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-white shadow-xl">
@@ -68,23 +68,32 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ providers, onSpinEnd, className }
             isSpinning ? "animate-spin-wheel" : "transition-all duration-300"
           )}
         >
-          {providers.map((provider, index) => (
-            <div 
-              key={provider.id}
-              className="wheel-section"
-              style={{
-                backgroundColor: provider.color,
-                transform: `rotate(${index * sectionAngle}deg)`,
-              }}
-            >
+          {providers.map((provider, index) => {
+            // Assign custom colors to each provider
+            let sectionColor;
+            if (index % 4 === 0) sectionColor = "#4285F4"; // Blue (GCP color)
+            else if (index % 4 === 1) sectionColor = "#F80000"; // Red (Oracle color)
+            else if (index % 4 === 2) sectionColor = "#0078D4"; // Azure Blue
+            else sectionColor = "#00C853"; // Green
+            
+            return (
               <div 
-                className="cloud-provider-text"
-                style={{ transform: `translateX(-50%) rotate(${90 - (index * sectionAngle) - (sectionAngle/2)}deg)` }}
+                key={provider.id}
+                className="wheel-section"
+                style={{
+                  backgroundColor: sectionColor,
+                  transform: `rotate(${index * sectionAngle}deg)`,
+                }}
               >
-                {provider.name}
+                <div 
+                  className="cloud-provider-text"
+                  style={{ transform: `translateX(-50%) rotate(${90 - (index * sectionAngle) - (sectionAngle/2)}deg)` }}
+                >
+                  {provider.name}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
       

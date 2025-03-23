@@ -54,7 +54,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-background to-secondary/50">
       <motion.div 
-        className="container max-w-4xl mx-auto"
+        className="container max-w-4xl mx-auto flex flex-col items-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -68,7 +68,7 @@ const Index = () => {
               </p>
             </motion.div>
             
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants} className="flex justify-center w-full">
               <SpinWheel 
                 providers={CLOUD_PROVIDERS} 
                 onSpinEnd={handleSpinEnd} 
