@@ -15,27 +15,46 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
   const [selectedProject, setSelectedProject] = useState<CloudProject | null>(null);
   const [isSelecting, setIsSelecting] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [stopSelection, setStopSelection] = useState(false);
+  const [speed, setSpeed] = useState(150); // Start with normal speed
   
   useEffect(() => {
-    if (stopSelection) {
-      setIsSelecting(false);
-      const finalProject = getRandomProject();
-      setSelectedProject(finalProject);
-      return;
-    }
+    // Only run the selection animation if we're in the selecting state
+    if (!isSelecting) return;
     
-    // Iterate through all projects indefinitely until stopped
+    // Set a random time between 3-6 seconds when the selection will stop
+    const stopTime = Math.floor(Math.random() * 3000) + 3000;
+    const stopTimer = setTimeout(() => {
+      // Slow down the animation before stopping
+      setSpeed(300); // Slower speed
+      
+      // Finally stop after the slowdown
+      const finalStopTimer = setTimeout(() => {
+        setIsSelecting(false);
+        // Pick a random project for the final selection
+        const finalProject = getRandomProject();
+        setSelectedProject(finalProject);
+      }, 1500); // Run the slowed animation for 1.5 seconds before stopping
+      
+      return () => clearTimeout(finalStopTimer);
+    }, stopTime);
+    
+    return () => clearTimeout(stopTimer);
+  }, []);
+  
+  useEffect(() => {
+    if (!isSelecting) return;
+    
+    // Iterate through all projects until stopped
     const interval = setInterval(() => {
       // Cycle through projects in order
       setCurrentIndex(prevIndex => (prevIndex + 1) % CLOUD_PROJECTS.length);
       setSelectedProject(CLOUD_PROJECTS[currentIndex]);
-    }, 150); // Slower speed for better visibility
+    }, speed); // Speed will change based on the slowdown effect
     
     return () => {
       clearInterval(interval);
     };
-  }, [currentIndex, stopSelection]);
+  }, [currentIndex, isSelecting, speed]);
 
   return (
     <motion.div
@@ -69,42 +88,28 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
           <h3 className="text-lg font-medium mb-2">Recommended Project</h3>
           
           {isSelecting ? (
-            <>
-              <div className="mb-4">
-                <ul className="space-y-1">
-                  {CLOUD_PROJECTS.map((project, idx) => (
-                    <motion.li 
-                      key={project.id} 
-                      className={cn(
-                        "py-1.5 px-3 rounded-md transition-colors",
-                        idx === currentIndex ? "bg-primary/10 font-medium" : ""
-                      )}
-                      animate={idx === currentIndex ? { 
-                        scale: 1.05,
-                        backgroundColor: `${provider.color}20`
-                      } : { scale: 1 }}
-                    >
-                      {idx === currentIndex && (
-                        <Sparkles className="h-4 w-4 inline mr-1" style={{ color: provider.color }} />
-                      )}
-                      {project.name}
-                    </motion.li>
-                  ))}
-                </ul>
-              </div>
-              <motion.button
-                onClick={() => setStopSelection(true)}
-                className={cn(
-                  "px-4 py-2 rounded-md text-white font-medium w-full",
-                  "shadow-md transition-all duration-300 transform",
-                  "focus:outline-none focus:ring-2 focus:ring-primary/50",
-                  "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-                )}
-                style={{ backgroundColor: provider.color }}
-              >
-                Stop Selection
-              </motion.button>
-            </>
+            <div className="mb-4">
+              <ul className="space-y-1">
+                {CLOUD_PROJECTS.map((project, idx) => (
+                  <motion.li 
+                    key={project.id} 
+                    className={cn(
+                      "py-1.5 px-3 rounded-md transition-colors",
+                      idx === currentIndex ? "bg-primary/10 font-medium" : ""
+                    )}
+                    animate={idx === currentIndex ? { 
+                      scale: 1.05,
+                      backgroundColor: `${provider.color}20`
+                    } : { scale: 1 }}
+                  >
+                    {idx === currentIndex && (
+                      <Sparkles className="h-4 w-4 inline mr-1" style={{ color: provider.color }} />
+                    )}
+                    {project.name}
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
           ) : (
             <div className="h-14 flex items-center justify-center">
               <AnimatePresence mode="wait">
