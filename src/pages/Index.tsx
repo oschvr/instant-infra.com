@@ -15,8 +15,8 @@ const CLOUD_PROVIDERS: CloudProvider[] = [
 ];
 
 const Index = () => {
-  const [selectedProvider, setSelectedProvider] = useState<CloudProvider | null>(null);
-  const [showResult, setShowResult] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<CloudProvider>(CLOUD_PROVIDERS[0]); // Default to the first provider
+  const [showResult, setShowResult] = useState(true); // Always show result from the beginning
   const [activeTab, setActiveTab] = useState("spin");
   
   const handleSpinEnd = (provider: CloudProvider) => {
@@ -95,7 +95,7 @@ const Index = () => {
               
               {/* Project Selection Side */}
               <div className="flex flex-col items-center justify-center">
-                {showResult && selectedProvider ? (
+                {showResult ? (
                   <CloudProviderResult 
                     provider={selectedProvider} 
                     onContinue={handleContinue} 
