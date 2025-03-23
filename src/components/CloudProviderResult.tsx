@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CloudProvider } from './SpinWheel';
 import { cn } from '@/lib/utils';
-import { CloudProject, getRandomProject } from '@/utils/projectData';
+import { CloudProject, getRandomProject, CLOUD_PROJECTS } from '@/utils/projectData';
 import { Sparkles } from 'lucide-react';
 
 interface CloudProviderResultProps {
@@ -14,26 +14,30 @@ interface CloudProviderResultProps {
 const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onContinue }) => {
   const [selectedProject, setSelectedProject] = useState<CloudProject | null>(null);
   const [isSelecting, setIsSelecting] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
   
   useEffect(() => {
-    // Simulate the project selection animation
-    const projectsCount = 15; // Number of projects to cycle through
+    // Iterate through all projects before selecting one
+    const projectsCount = 20; // Number of iterations to cycle through
     let counter = 0;
     
     const interval = setInterval(() => {
       if (counter < projectsCount) {
-        setSelectedProject(getRandomProject());
+        // Cycle through projects in order
+        setCurrentIndex(prevIndex => (prevIndex + 1) % CLOUD_PROJECTS.length);
+        setSelectedProject(CLOUD_PROJECTS[currentIndex]);
         counter++;
       } else {
         clearInterval(interval);
         setIsSelecting(false);
-        // Final selection
-        setSelectedProject(getRandomProject());
+        // Final selection - random
+        const finalProject = getRandomProject();
+        setSelectedProject(finalProject);
       }
     }, 150); // Speed of cycling through projects
     
     return () => clearInterval(interval);
-  }, []);
+  }, [currentIndex]);
 
   return (
     <motion.div
@@ -69,7 +73,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
             <AnimatePresence mode="wait">
               {selectedProject && (
                 <motion.div
-                  key={isSelecting ? Math.random() : selectedProject.id}
+                  key={isSelecting ? `project-${currentIndex}` : selectedProject.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -79,9 +83,18 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
                   }}
                   className="text-xl font-bold flex items-center gap-2"
                 >
-                  {!isSelecting && <Sparkles className="h-5 w-5" style={{ color: provider.color }} />}
-                  {selectedProject.name}
-                  {!isSelecting && <Sparkles className="h-5 w-5" style={{ color: provider.color }} />}
+                  {isSelecting ? (
+                    <>
+                      <Sparkles className="h-5 w-5 animate-pulse" style={{ color: provider.color }} />
+                      {selectedProject.name}
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
+                      {selectedProject.name}
+                      <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
