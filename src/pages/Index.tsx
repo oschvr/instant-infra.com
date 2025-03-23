@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import SpinWheel, { CloudProvider } from '@/components/SpinWheel';
 import CloudProviderResult from '@/components/CloudProviderResult';
@@ -26,8 +25,7 @@ const Index = () => {
   
   const handleContinue = () => {
     setShowResult(false);
-    setSelectedProvider(null);
-    toast.info('Starting a new spin!');
+    // We'll keep selectedProvider until user spins again
   };
   
   const containerVariants = {
