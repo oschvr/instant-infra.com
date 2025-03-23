@@ -18,7 +18,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
   
   useEffect(() => {
     // Iterate through all projects before selecting one
-    const projectsCount = 20; // Number of iterations to cycle through
+    const projectsCount = 15; // Reduced number of iterations to finish faster
     let counter = 0;
     
     const interval = setInterval(() => {
@@ -34,9 +34,22 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
         const finalProject = getRandomProject();
         setSelectedProject(finalProject);
       }
-    }, 150); // Speed of cycling through projects
+    }, 100); // Speed increased (100ms instead of 150ms)
     
-    return () => clearInterval(interval);
+    // Maximum animation time of 10 seconds
+    const maxAnimationTime = setTimeout(() => {
+      clearInterval(interval);
+      if (isSelecting) {
+        setIsSelecting(false);
+        const finalProject = getRandomProject();
+        setSelectedProject(finalProject);
+      }
+    }, 8000); // 8 seconds as safety margin
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(maxAnimationTime);
+    };
   }, [currentIndex]);
 
   return (
@@ -69,36 +82,50 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
         
         <div className="mt-4 w-full">
           <h3 className="text-lg font-medium mb-2">Recommended Project</h3>
-          <div className="h-14 flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              {selectedProject && (
-                <motion.div
-                  key={isSelecting ? `project-${currentIndex}` : selectedProject.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ 
-                    duration: isSelecting ? 0.1 : 0.3,
-                    ease: isSelecting ? "linear" : "easeOut" 
-                  }}
-                  className="text-xl font-bold flex items-center gap-2"
-                >
-                  {isSelecting ? (
-                    <>
-                      <Sparkles className="h-5 w-5 animate-pulse" style={{ color: provider.color }} />
-                      {selectedProject.name}
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
-                      {selectedProject.name}
-                      <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
-                    </>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          
+          {isSelecting ? (
+            <div className="h-40 overflow-y-auto p-2 bg-background/50 rounded-md shadow-inner mb-3">
+              <ul className="space-y-1">
+                {CLOUD_PROJECTS.map((project, idx) => (
+                  <motion.li 
+                    key={project.id} 
+                    className={cn(
+                      "py-1.5 px-3 rounded-md transition-colors",
+                      idx === currentIndex ? "bg-primary/10 font-medium" : ""
+                    )}
+                    animate={idx === currentIndex ? { 
+                      scale: 1.05,
+                      backgroundColor: `${provider.color}20`
+                    } : { scale: 1 }}
+                  >
+                    {idx === currentIndex && (
+                      <Sparkles className="h-4 w-4 inline mr-1" style={{ color: provider.color }} />
+                    )}
+                    {project.name}
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="h-14 flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                {selectedProject && (
+                  <motion.div
+                    key={selectedProject.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="text-xl font-bold flex items-center gap-2"
+                  >
+                    <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
+                    {selectedProject.name}
+                    <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </div>
       
