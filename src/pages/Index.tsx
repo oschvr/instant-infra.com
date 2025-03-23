@@ -5,6 +5,7 @@ import CloudProviderResult from '@/components/CloudProviderResult';
 import ProjectTracker from '@/components/ProjectTracker';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CLOUD_PROVIDERS: CloudProvider[] = [
   { id: 'aws', name: 'AWS', color: '#FF9900' },
@@ -16,6 +17,7 @@ const CLOUD_PROVIDERS: CloudProvider[] = [
 const Index = () => {
   const [selectedProvider, setSelectedProvider] = useState<CloudProvider | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [activeTab, setActiveTab] = useState("spin");
   
   const handleSpinEnd = (provider: CloudProvider) => {
     setSelectedProvider(provider);
@@ -27,7 +29,6 @@ const Index = () => {
   
   const handleContinue = () => {
     setShowResult(false);
-    // We'll keep selectedProvider until user spins again
   };
   
   const containerVariants = {
@@ -54,40 +55,77 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-background to-secondary/50">
       <motion.div 
-        className="container max-w-4xl mx-auto flex flex-col items-center"
+        className="container max-w-6xl mx-auto flex flex-col items-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {!showResult ? (
-          <>
-            <motion.div variants={itemVariants} className="text-center mb-12">
-              <h1 className="text-4xl font-bold mb-3 tracking-tight">Spin to Cloud</h1>
-              <p className="text-muted-foreground max-w-lg mx-auto">
-                Spin the wheel to randomly select your cloud provider for your next project.
-              </p>
-            </motion.div>
-            
-            <motion.div variants={itemVariants} className="flex justify-center w-full">
-              <SpinWheel 
-                providers={CLOUD_PROVIDERS} 
-                onSpinEnd={handleSpinEnd} 
-                className="mb-10"
-              />
-            </motion.div>
-          </>
-        ) : (
-          selectedProvider && (
-            <CloudProviderResult 
-              provider={selectedProvider} 
-              onContinue={handleContinue} 
-            />
-          )
-        )}
+        <motion.div variants={itemVariants} className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-3 tracking-tight">Spin to Cloud</h1>
+          <p className="text-muted-foreground max-w-lg mx-auto">
+            Spin the wheel to randomly select your cloud provider for your next project.
+          </p>
+        </motion.div>
+        
+        <Tabs 
+          defaultValue="spin" 
+          className="w-full" 
+          value={activeTab} 
+          onValueChange={setActiveTab}
+        >
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="spin">Spin &amp; Selection</TabsTrigger>
+            <TabsTrigger value="tracker">Project Tracker</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="spin">
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Spin Wheel Side */}
+              <div className="flex flex-col items-center justify-center">
+                <motion.div 
+                  variants={itemVariants} 
+                  className="flex justify-center w-full"
+                >
+                  <SpinWheel 
+                    providers={CLOUD_PROVIDERS} 
+                    onSpinEnd={handleSpinEnd} 
+                  />
+                </motion.div>
+              </div>
+              
+              {/* Project Selection Side */}
+              <div className="flex flex-col items-center justify-center">
+                {showResult && selectedProvider ? (
+                  <CloudProviderResult 
+                    provider={selectedProvider} 
+                    onContinue={handleContinue} 
+                  />
+                ) : (
+                  <motion.div 
+                    variants={itemVariants}
+                    className="glass-panel rounded-xl p-8 h-full flex flex-col items-center justify-center text-center"
+                  >
+                    <h2 className="text-2xl font-semibold mb-4">Project Selection</h2>
+                    <p className="text-muted-foreground mb-8">
+                      Spin the wheel on the left to select a cloud provider and get a recommended project.
+                    </p>
+                    <motion.div 
+                      whileHover={{ scale: 1.05 }}
+                      className="text-5xl font-bold text-primary/30"
+                    >
+                      ?
+                    </motion.div>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="tracker">
+            <ProjectTracker providers={CLOUD_PROVIDERS} />
+          </TabsContent>
+        </Tabs>
       </motion.div>
-      
-      {/* Project Tracker section - always visible */}
-      <ProjectTracker providers={CLOUD_PROVIDERS} />
       
       <motion.footer 
         className="mt-auto pt-8 pb-4 text-center text-sm text-muted-foreground"

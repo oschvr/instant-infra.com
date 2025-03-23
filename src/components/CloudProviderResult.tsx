@@ -42,12 +42,12 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="glass-panel rounded-xl p-8 md:p-10 max-w-md mx-auto text-center"
+      className="glass-panel rounded-xl p-6 w-full h-full"
     >
       <h2 className="text-2xl font-medium mb-2">Your Cloud Provider</h2>
       
       <div 
-        className="mt-6 mb-8 py-10 px-8 rounded-lg flex flex-col items-center justify-center gap-5"
+        className="mt-4 mb-6 py-6 px-4 rounded-lg flex flex-col items-center justify-center gap-3"
         style={{ backgroundColor: `${provider.color}20` }}
       >
         <motion.div
@@ -59,13 +59,13 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
             damping: 15,
             delay: 0.2
           }}
-          className="text-5xl font-bold"
+          className="text-4xl font-bold"
           style={{ color: provider.color }}
         >
           {provider.name}
         </motion.div>
         
-        <div className="mt-4 w-full">
+        <div className="mt-2 w-full">
           <h3 className="text-lg font-medium mb-2">Recommended Project</h3>
           
           {isSelecting ? (
@@ -95,7 +95,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
               <motion.button
                 onClick={() => setStopSelection(true)}
                 className={cn(
-                  "px-4 py-2 rounded-md text-white font-medium",
+                  "px-4 py-2 rounded-md text-white font-medium w-full",
                   "shadow-md transition-all duration-300 transform",
                   "focus:outline-none focus:ring-2 focus:ring-primary/50",
                   "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
@@ -134,13 +134,13 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
         transition={{ delay: 0.5 }}
         onClick={onContinue}
         className={cn(
-          "button-shine relative px-8 py-3 rounded-full bg-primary text-primary-foreground font-medium",
+          "button-shine relative px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium",
           "shadow-md transition-all duration-300 transform",
           "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2",
-          "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto"
+          "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 w-full"
         )}
       >
-        Continue
+        Try Again
       </motion.button>
     </motion.div>
   );
