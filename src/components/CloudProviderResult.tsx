@@ -13,7 +13,7 @@ interface CloudProviderResultProps {
 
 const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onContinue }) => {
   const [selectedProject, setSelectedProject] = useState<CloudProject | null>(null);
-  const [isSelecting, setIsSelecting] = useState(true);
+  const [isSelecting, setIsSelecting] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [speed, setSpeed] = useState(150); // Start with normal speed
   
@@ -39,7 +39,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
     }, stopTime);
     
     return () => clearTimeout(stopTimer);
-  }, []);
+  }, [isSelecting]);
   
   useEffect(() => {
     if (!isSelecting) return;
@@ -55,6 +55,14 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
       clearInterval(interval);
     };
   }, [currentIndex, isSelecting, speed]);
+
+  // Start the selection process when the provider changes
+  // This will trigger when the wheel stops spinning
+  useEffect(() => {
+    if (provider) {
+      setIsSelecting(true);
+    }
+  }, [provider]);
 
   return (
     <motion.div
