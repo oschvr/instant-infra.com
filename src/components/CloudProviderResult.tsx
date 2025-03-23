@@ -15,42 +15,27 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
   const [selectedProject, setSelectedProject] = useState<CloudProject | null>(null);
   const [isSelecting, setIsSelecting] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [stopSelection, setStopSelection] = useState(false);
   
   useEffect(() => {
-    // Iterate through all projects before selecting one
-    const projectsCount = 15; // Reduced number of iterations to finish faster
-    let counter = 0;
+    if (stopSelection) {
+      setIsSelecting(false);
+      const finalProject = getRandomProject();
+      setSelectedProject(finalProject);
+      return;
+    }
     
+    // Iterate through all projects indefinitely until stopped
     const interval = setInterval(() => {
-      if (counter < projectsCount) {
-        // Cycle through projects in order
-        setCurrentIndex(prevIndex => (prevIndex + 1) % CLOUD_PROJECTS.length);
-        setSelectedProject(CLOUD_PROJECTS[currentIndex]);
-        counter++;
-      } else {
-        clearInterval(interval);
-        setIsSelecting(false);
-        // Final selection - random
-        const finalProject = getRandomProject();
-        setSelectedProject(finalProject);
-      }
-    }, 100); // Speed increased (100ms instead of 150ms)
-    
-    // Maximum animation time of 10 seconds
-    const maxAnimationTime = setTimeout(() => {
-      clearInterval(interval);
-      if (isSelecting) {
-        setIsSelecting(false);
-        const finalProject = getRandomProject();
-        setSelectedProject(finalProject);
-      }
-    }, 8000); // 8 seconds as safety margin
+      // Cycle through projects in order
+      setCurrentIndex(prevIndex => (prevIndex + 1) % CLOUD_PROJECTS.length);
+      setSelectedProject(CLOUD_PROJECTS[currentIndex]);
+    }, 150); // Slower speed for better visibility
     
     return () => {
       clearInterval(interval);
-      clearTimeout(maxAnimationTime);
     };
-  }, [currentIndex]);
+  }, [currentIndex, stopSelection]);
 
   return (
     <motion.div
@@ -84,28 +69,42 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
           <h3 className="text-lg font-medium mb-2">Recommended Project</h3>
           
           {isSelecting ? (
-            <div className="h-40 overflow-y-auto p-2 bg-background/50 rounded-md shadow-inner mb-3">
-              <ul className="space-y-1">
-                {CLOUD_PROJECTS.map((project, idx) => (
-                  <motion.li 
-                    key={project.id} 
-                    className={cn(
-                      "py-1.5 px-3 rounded-md transition-colors",
-                      idx === currentIndex ? "bg-primary/10 font-medium" : ""
-                    )}
-                    animate={idx === currentIndex ? { 
-                      scale: 1.05,
-                      backgroundColor: `${provider.color}20`
-                    } : { scale: 1 }}
-                  >
-                    {idx === currentIndex && (
-                      <Sparkles className="h-4 w-4 inline mr-1" style={{ color: provider.color }} />
-                    )}
-                    {project.name}
-                  </motion.li>
-                ))}
-              </ul>
-            </div>
+            <>
+              <div className="mb-4">
+                <ul className="space-y-1">
+                  {CLOUD_PROJECTS.map((project, idx) => (
+                    <motion.li 
+                      key={project.id} 
+                      className={cn(
+                        "py-1.5 px-3 rounded-md transition-colors",
+                        idx === currentIndex ? "bg-primary/10 font-medium" : ""
+                      )}
+                      animate={idx === currentIndex ? { 
+                        scale: 1.05,
+                        backgroundColor: `${provider.color}20`
+                      } : { scale: 1 }}
+                    >
+                      {idx === currentIndex && (
+                        <Sparkles className="h-4 w-4 inline mr-1" style={{ color: provider.color }} />
+                      )}
+                      {project.name}
+                    </motion.li>
+                  ))}
+                </ul>
+              </div>
+              <motion.button
+                onClick={() => setStopSelection(true)}
+                className={cn(
+                  "px-4 py-2 rounded-md text-white font-medium",
+                  "shadow-md transition-all duration-300 transform",
+                  "focus:outline-none focus:ring-2 focus:ring-primary/50",
+                  "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+                )}
+                style={{ backgroundColor: provider.color }}
+              >
+                Stop Selection
+              </motion.button>
+            </>
           ) : (
             <div className="h-14 flex items-center justify-center">
               <AnimatePresence mode="wait">
