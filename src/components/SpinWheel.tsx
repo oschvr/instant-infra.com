@@ -56,6 +56,9 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ providers, onSpinEnd, className }
   
   return (
     <div className={cn("relative mx-auto flex flex-col items-center", className)}>
+      {/* Indicator at the top */}
+      <div className="indicator bg-primary"></div>
+      
       {/* Wheel */}
       <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-white shadow-xl">
         <div 
@@ -89,9 +92,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ providers, onSpinEnd, className }
             );
           })}
         </div>
-        
-        {/* Indicator - now at the bottom */}
-        <div className="indicator bg-primary"></div>
       </div>
       
       {/* Spin button */}

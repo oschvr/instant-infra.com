@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -116,9 +115,9 @@
   
   .indicator {
     position: absolute;
-    bottom: -10px;
+    top: -10px;
     left: 50%;
-    transform: translateX(-50%) rotate(180deg);
+    transform: translateX(-50%);
     width: 30px;
     height: 30px;
     clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
