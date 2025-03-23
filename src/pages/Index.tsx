@@ -1,13 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SpinWheel, { CloudProvider } from '@/components/SpinWheel';
 import CloudProviderResult from '@/components/CloudProviderResult';
 import ProjectTracker from '@/components/ProjectTracker';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetchCloudProviders } from '@/services/cloudProviderService';
+import { useQuery } from '@tanstack/react-query';
 
-const CLOUD_PROVIDERS: CloudProvider[] = [
+// Default cloud providers as fallback
+const DEFAULT_PROVIDERS: CloudProvider[] = [
   { id: 'aws', name: 'AWS', color: '#FF9900' },
   { id: 'gcp', name: 'GCP', color: '#4285F4' },
   { id: 'azure', name: 'Azure', color: '#0078D4' },
@@ -15,9 +18,22 @@ const CLOUD_PROVIDERS: CloudProvider[] = [
 ];
 
 const Index = () => {
-  const [selectedProvider, setSelectedProvider] = useState<CloudProvider>(CLOUD_PROVIDERS[0]); // Default to the first provider
-  const [showResult, setShowResult] = useState(true); // Always show result from the beginning
+  const { data: cloudProviders, isLoading, error } = useQuery({
+    queryKey: ['cloudProviders'],
+    queryFn: fetchCloudProviders,
+  });
+  
+  const providers = cloudProviders || DEFAULT_PROVIDERS;
+  const [selectedProvider, setSelectedProvider] = useState<CloudProvider>(providers[0]); 
+  const [showResult, setShowResult] = useState(true);
   const [activeTab, setActiveTab] = useState("spin");
+  
+  // Update selectedProvider when providers are loaded
+  useEffect(() => {
+    if (cloudProviders && cloudProviders.length > 0) {
+      setSelectedProvider(cloudProviders[0]);
+    }
+  }, [cloudProviders]);
   
   const handleSpinEnd = (provider: CloudProvider) => {
     setSelectedProvider(provider);
@@ -51,6 +67,18 @@ const Index = () => {
       transition: { duration: 0.5, ease: "easeOut" }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    toast.error("Failed to load cloud providers. Using default providers.");
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-background to-secondary/50">
@@ -87,7 +115,7 @@ const Index = () => {
                   className="flex justify-center w-full"
                 >
                   <SpinWheel 
-                    providers={CLOUD_PROVIDERS} 
+                    providers={providers} 
                     onSpinEnd={handleSpinEnd} 
                   />
                 </motion.div>
@@ -122,7 +150,7 @@ const Index = () => {
           </TabsContent>
           
           <TabsContent value="tracker">
-            <ProjectTracker providers={CLOUD_PROVIDERS} />
+            <ProjectTracker providers={providers} />
           </TabsContent>
         </Tabs>
       </motion.div>
