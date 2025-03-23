@@ -16,6 +16,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
   const [isSelecting, setIsSelecting] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [speed, setSpeed] = useState(150); // Start with normal speed
+  const [hasSpun, setHasSpun] = useState(false);
   
   useEffect(() => {
     // Only run the selection animation if we're in the selecting state
@@ -56,13 +57,14 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
     };
   }, [currentIndex, isSelecting, speed]);
 
-  // Start the selection process when the provider changes
-  // This will trigger when the wheel stops spinning
+  // Track when the provider actually changes from its initial value
   useEffect(() => {
-    if (provider) {
+    // Check if this is not the initial render and wheel has been spun
+    if (!hasSpun && provider) {
+      setHasSpun(true);
       setIsSelecting(true);
     }
-  }, [provider]);
+  }, [provider, hasSpun]);
 
   return (
     <motion.div
@@ -95,7 +97,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
         <div className="mt-2 w-full">
           <h3 className="text-lg font-medium mb-2">Recommended Project</h3>
           
-          {isSelecting ? (
+          {isSelecting && hasSpun ? (
             <div className="mb-4">
               <ul className="space-y-1">
                 {CLOUD_PROJECTS.map((project, idx) => (
@@ -118,24 +120,35 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
                 ))}
               </ul>
             </div>
-          ) : (
+          ) : hasSpun && selectedProject ? (
             <div className="h-14 flex items-center justify-center">
               <AnimatePresence mode="wait">
-                {selectedProject && (
-                  <motion.div
-                    key={selectedProject.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="text-xl font-bold flex items-center gap-2"
-                  >
-                    <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
-                    {selectedProject.name}
-                    <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
-                  </motion.div>
-                )}
+                <motion.div
+                  key={selectedProject.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="text-xl font-bold flex items-center gap-2"
+                >
+                  <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
+                  {selectedProject.name}
+                  <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
+                </motion.div>
               </AnimatePresence>
+            </div>
+          ) : (
+            <div className="mb-4">
+              <ul className="space-y-1">
+                {CLOUD_PROJECTS.map((project) => (
+                  <li 
+                    key={project.id} 
+                    className="py-1.5 px-3 rounded-md transition-colors"
+                  >
+                    {project.name}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
