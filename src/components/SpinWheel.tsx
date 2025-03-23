@@ -56,9 +56,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ providers, onSpinEnd, className }
   
   return (
     <div className={cn("relative mx-auto flex flex-col items-center", className)}>
-      {/* Indicator */}
-      <div className="indicator animate-pulse-subtle bg-primary"></div>
-      
       {/* Wheel */}
       <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-white shadow-xl">
         <div 
@@ -69,12 +66,9 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ providers, onSpinEnd, className }
           )}
         >
           {providers.map((provider, index) => {
-            // Assign custom colors to each provider
-            let sectionColor;
-            if (index % 4 === 0) sectionColor = "#4285F4"; // Blue (GCP color)
-            else if (index % 4 === 1) sectionColor = "#F80000"; // Red (Oracle color)
-            else if (index % 4 === 2) sectionColor = "#0078D4"; // Azure Blue
-            else sectionColor = "#00C853"; // Green
+            // Assign specific colors to each provider
+            const colors = ["#4285F4", "#F80000", "#0078D4", "#00C853"];
+            const sectionColor = colors[index % colors.length];
             
             return (
               <div 
@@ -95,6 +89,9 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ providers, onSpinEnd, className }
             );
           })}
         </div>
+        
+        {/* Indicator - now at the bottom */}
+        <div className="indicator bg-primary"></div>
       </div>
       
       {/* Spin button */}
