@@ -3,12 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CLOUD_PROJECTS } from '@/utils/projectData';
-import { CloudProvider } from './SpinWheel';
+import { CloudProvider } from '@/types/cloudProvider';
 import { motion } from 'framer-motion';
+import { Deployment } from '@/types/deployment';
 
 interface ProjectTrackerProps {
   providers: CloudProvider[];
+  deployments: Deployment[]
 }
 
 type CompletedProject = {
@@ -16,7 +17,7 @@ type CompletedProject = {
   providerId: string;
 };
 
-const ProjectTracker: React.FC<ProjectTrackerProps> = ({ providers }) => {
+const ProjectTracker: React.FC<ProjectTrackerProps> = ({ providers, deployments }) => {
   const [completedProjects, setCompletedProjects] = useState<CompletedProject[]>([]);
   
   // Load completed projects from localStorage on component mount
@@ -85,16 +86,16 @@ const ProjectTracker: React.FC<ProjectTrackerProps> = ({ providers }) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {CLOUD_PROJECTS.map(project => (
-                  <TableRow key={project.id}>
+                {deployments.map(project => (
+                  <TableRow key={project.name}>
                     <TableCell className="font-medium">{project.name}</TableCell>
                     {providers.map(provider => (
                       <TableCell key={provider.id} className="text-center">
                         <div className="flex justify-center">
                           <Checkbox
-                            id={`${project.id}-${provider.id}`}
-                            checked={isCompleted(project.id, provider.id)}
-                            onCheckedChange={() => toggleCompleted(project.id, provider.id)}
+                            id={`${project.name}-${provider.id}`}
+                            checked={isCompleted(project.name, provider.id)}
+                            onCheckedChange={() => toggleCompleted(project.name, provider.id)}
                             className="data-[state=checked]:bg-[--provider-color] data-[state=checked]:border-[--provider-color]"
                             style={{ 
                               "--provider-color": provider.color 

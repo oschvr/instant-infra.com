@@ -1,30 +1,30 @@
 
 import React, { useState, useEffect } from 'react';
 import SpinWheel, { CloudProvider } from '@/components/SpinWheel';
-import CloudProviderResult from '@/components/CloudProviderResult';
+import CloudProviderResult from '@/components/Deployments';
 import ProjectTracker from '@/components/ProjectTracker';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchCloudProviders } from '@/services/cloudProviderService';
 import { useQuery } from '@tanstack/react-query';
-import { Sparkles } from 'lucide-react';
+import {  } from 'lucide-react';
+import { fetchDeployments } from '@/services/deploymentsService';
 
-// Default cloud providers as fallback
-const DEFAULT_PROVIDERS: CloudProvider[] = [
-  { id: 'aws', name: 'AWS', color: '#FF9900' },
-  { id: 'gcp', name: 'GCP', color: '#4285F4' },
-  { id: 'azure', name: 'Azure', color: '#0078D4' },
-  { id: 'oracle', name: 'Oracle', color: '#F80000' },
-];
+
 
 const Index = () => {
   const { data: cloudProviders, isLoading, error } = useQuery({
     queryKey: ['cloudProviders'],
     queryFn: fetchCloudProviders,
   });
+
+  const { data: deployments, } = useQuery({
+    queryKey: ['deployments'],
+    queryFn: fetchDeployments,
+  });
   
-  const providers = cloudProviders || DEFAULT_PROVIDERS;
+  const providers = cloudProviders;
   const [selectedProvider, setSelectedProvider] = useState<CloudProvider | null>(null);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("provider");
@@ -38,17 +38,20 @@ const Index = () => {
   
   const handleSpinEnd = (provider: CloudProvider) => {
     setSelectedProvider(provider);
-    toast.success(`You landed on ${provider.name}!`);
-    // Automatically switch to project tab after selecting provider
+    
+    
     setTimeout(() => {
       setActiveTab("project");
-    }, 1500);
+    }, 3000);
   };
   
   const handleProjectSelect = (projectName: string) => {
     setSelectedProject(projectName);
-    toast.success(`Project selected: ${projectName}`);
   };
+
+  const handleContinue = (tab: string) => {
+    setActiveTab(tab)
+  }
   
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -92,32 +95,18 @@ const Index = () => {
         animate="visible"
       >
         <motion.div variants={itemVariants} className="text-center mb-4">
-          <h1 className="text-4xl font-bold mb-3 tracking-tight">Spin to Cloud</h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Spin the wheel to randomly select your cloud provider for your next project.
+          <h1 className="text-4xl font-bold mb-3 tracking-tight">Instant Infra ⚡️</h1>
+          <p className="text-muted-foreground max-w-lg py-4 mb-3">
+           Rules of the game:
+          <ul className="text-left list-disc pl-6 space-y-2">
+            <li>1. Spin the wheel to select a cloud provider</li>
+            <li>2. Choose a genering deployment</li>
+            <li>3. Record yourself doing it</li>
+            <li>4. Save progress in the progress tracker</li>
+          </ul>
           </p>
         </motion.div>
         
-        {/* Outcome display at the top */}
-        {selectedProvider && selectedProject && (
-          <motion.div 
-            variants={itemVariants} 
-            className="glass-panel rounded-xl p-4 mb-6 text-center w-full max-w-xl"
-            style={{ backgroundColor: `${selectedProvider.color}20` }}
-          >
-            <h2 className="text-xl font-medium mb-2">Your Selection</h2>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5" style={{ color: selectedProvider.color }} />
-              <span className="text-2xl font-bold" style={{ color: selectedProvider.color }}>
-                {selectedProvider.name}
-              </span>
-              <Sparkles className="h-5 w-5" style={{ color: selectedProvider.color }} />
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-lg font-medium">Project: {selectedProject}</span>
-            </div>
-          </motion.div>
-        )}
         
         <Tabs 
           value={activeTab} 
@@ -148,25 +137,19 @@ const Index = () => {
             <div className="w-full flex flex-col items-center justify-center">
               <CloudProviderResult 
                 provider={selectedProvider || providers[0]}
+                deployments={deployments}
                 onProjectSelect={handleProjectSelect}
+                onClickContinue={handleContinue}
               />
             </div>
           </TabsContent>
           
           <TabsContent value="tracker">
-            <ProjectTracker providers={providers} />
+            <ProjectTracker providers={providers} deployments={deployments} />
           </TabsContent>
         </Tabs>
       </motion.div>
       
-      <motion.footer 
-        className="mt-auto pt-8 pb-4 text-center text-sm text-muted-foreground"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.5 }}
-      >
-        Designed with simplicity and elegance in mind.
-      </motion.footer>
     </div>
   );
 };

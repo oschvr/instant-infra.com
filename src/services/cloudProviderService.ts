@@ -1,11 +1,11 @@
 
 import { supabase } from '@/lib/supabase';
-import { CloudProvider } from '@/components/SpinWheel';
+import { CloudProvider } from '@/types/cloudProvider';
 
 export async function fetchCloudProviders(): Promise<CloudProvider[]> {
   try {
     const { data, error } = await supabase
-      .from('cloud_providers')
+      .from('providers')
       .select('*');
     
     if (error) {

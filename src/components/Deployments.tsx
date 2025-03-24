@@ -1,18 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CloudProvider } from './SpinWheel';
+import { CloudProvider } from '@/types/cloudProvider';
+import { Deployment } from '@/types/deployment';
 import { cn } from '@/lib/utils';
-import { CloudProject, getRandomProject, CLOUD_PROJECTS } from '@/utils/projectData';
 import { Sparkles } from 'lucide-react';
 
-interface CloudProviderResultProps {
+interface DeploymentsProps {
   provider: CloudProvider;
+  deployments: Deployment[];
   onProjectSelect: (projectName: string) => void;
+  onClickContinue: (tab: string) => void;
 }
 
-const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onProjectSelect }) => {
-  const [selectedProject, setSelectedProject] = useState<CloudProject | null>(null);
+const Deployments: React.FC<DeploymentsProps> = ({ provider, deployments, onProjectSelect, onClickContinue }) => {
+  const [selectedProject, setSelectedProject] = useState<Deployment | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [speed, setSpeed] = useState(150); // Start with normal speed
@@ -36,7 +37,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onP
       const finalStopTimer = setTimeout(() => {
         setIsSelecting(false);
         // Pick a random project for the final selection
-        const finalProject = getRandomProject();
+        const finalProject = deployments[Math.floor(Math.random() * deployments.length)];
         setSelectedProject(finalProject);
         onProjectSelect(finalProject.name);
       }, 1500); // Run the slowed animation for 1.5 seconds before stopping
@@ -53,8 +54,8 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onP
     // Iterate through all projects until stopped
     const interval = setInterval(() => {
       // Cycle through projects in order
-      setCurrentIndex(prevIndex => (prevIndex + 1) % CLOUD_PROJECTS.length);
-      setSelectedProject(CLOUD_PROJECTS[currentIndex]);
+      setCurrentIndex(prevIndex => (prevIndex + 1) % deployments.length);
+      setSelectedProject(deployments[currentIndex]);
     }, speed); // Speed will change based on the slowdown effect
     
     return () => {
@@ -69,33 +70,27 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onP
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="glass-panel rounded-xl p-6 w-full max-w-lg"
     >
-      <h2 className="text-2xl font-medium mb-6 text-center">Select a Project</h2>
       
       <div 
         className="mb-6 py-6 px-4 rounded-lg flex flex-col items-center justify-center gap-3"
-        style={{ backgroundColor: `${provider.color}20` }}
       >        
         <div className="w-full">
-          <h3 className="text-lg font-medium mb-4 text-center">Recommended Project</h3>
           
           {isSelecting ? (
             <div className="mb-4">
               <ul className="space-y-1">
-                {CLOUD_PROJECTS.map((project, idx) => (
+                {deployments.map((project, idx) => (
                   <motion.li 
-                    key={project.id} 
+                    key={project.name} 
                     className={cn(
                       "py-1.5 px-3 rounded-md transition-colors",
                       idx === currentIndex ? "bg-primary/10 font-medium" : ""
                     )}
                     animate={idx === currentIndex ? { 
-                      scale: 1.05,
+                      scale: 1.1,
                       backgroundColor: `${provider.color}20`
                     } : { scale: 1 }}
                   >
-                    {idx === currentIndex && (
-                      <Sparkles className="h-4 w-4 inline mr-1" style={{ color: provider.color }} />
-                    )}
                     {project.name}
                   </motion.li>
                 ))}
@@ -105,29 +100,32 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onP
             <div className="h-14 flex items-center justify-center">
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={selectedProject.id}
+                  key={selectedProject.name}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="text-xl font-bold flex items-center gap-2"
+                  className="rounded-xl p-2 mb-4 text-center w-full max-w-xl"
                 >
-                  <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
-                  {selectedProject.name}
-                  <Sparkles className="h-5 w-5" style={{ color: provider.color }} />
+                  
+                  ⚡️ <h2 className="text-xl font-medium mb-2">  You're doing a <span className="text-2xl font-bold" style={{ color: provider.color }}>
+                {selectedProject.name}
+              </span> in <span className="text-2xl font-bold" style={{ color: provider.color }}>
+                {provider.name} 
+              </span></h2> ⚡️
                 </motion.div>
               </AnimatePresence>
             </div>
           ) : (
             <div className="mb-4">
-              <p className="text-center mb-2">Click the button below to get a recommended project</p>
+              
               <ul className="space-y-1">
-                {CLOUD_PROJECTS.map((project) => (
+                {deployments.map((project) => (
                   <li 
-                    key={project.id} 
+                    key={project.name} 
                     className="py-1.5 px-3 rounded-md transition-colors opacity-70"
                   >
-                    {project.name}
+                    {project.name} 
                   </li>
                 ))}
               </ul>
@@ -136,7 +134,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onP
         </div>
       </div>
       
-      <motion.button
+        {!selectedProject && <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={startProjectSelection}
@@ -151,10 +149,25 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onP
           "animate-fade-in w-full"
         )}
       >
-        {isSelecting ? 'Selecting...' : selectedProject ? 'Select Another Project' : 'Find Me a Project'}
-      </motion.button>
+        Find Me a Project
+      </motion.button>}
+      {!isSelecting && selectedProject && <motion.button whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        
+        disabled={isSelecting}
+        className={cn(
+          "button-shine relative px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium",
+          "shadow-md transition-all duration-300 transform",
+          "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2",
+          isSelecting 
+            ? "opacity-70 cursor-not-allowed"
+            : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0",
+          "animate-fade-in w-full"
+        )} onClick={() => onClickContinue("tracker")}>
+        Continue
+        </motion.button>}
     </motion.div>
   );
 };
 
-export default CloudProviderResult;
+export default Deployments;

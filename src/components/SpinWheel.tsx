@@ -1,12 +1,9 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Wheel } from "react-custom-roulette";
+import { CloudProvider } from '@/types/cloudProvider';
 
-export interface CloudProvider {
-  id: string;
-  name: string;
-  color: string;
-}
 
 interface SpinWheelProps {
   providers: CloudProvider[];
@@ -15,101 +12,55 @@ interface SpinWheelProps {
 }
 
 const SpinWheel: React.FC<SpinWheelProps> = ({ providers, onSpinEnd, className }) => {
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState<CloudProvider | null>(null);
-  const wheelRef = useRef<HTMLDivElement>(null);
-  const sectionAngle = 360 / providers.length;
-  
-  const spinWheel = () => {
-    if (isSpinning) return;
-    
-    setIsSpinning(true);
-    setSelectedProvider(null);
-    
-    // Generate random number of full rotations (3-5) plus a random angle
-    const fullRotations = Math.floor(Math.random() * 3) + 3;
-    const randomAngle = Math.floor(Math.random() * 360);
-    const totalAngle = fullRotations * 360 + randomAngle;
-    
-    // Calculate which provider will be selected
-    const normalizedAngle = randomAngle % 360;
-    const sectionIndex = Math.floor((360 - normalizedAngle) / sectionAngle) % providers.length;
-    const selectedProvider = providers[sectionIndex];
-    
-    // Set spin animation
-    if (wheelRef.current) {
-      wheelRef.current.style.setProperty('--spin-angle', `${totalAngle}deg`);
-      wheelRef.current.style.setProperty('--spin-duration', `${3 + Math.random() * 2}s`);
-      wheelRef.current.classList.remove('animate-spin-wheel');
-      // Force a reflow
-      void wheelRef.current.offsetWidth;
-      wheelRef.current.classList.add('animate-spin-wheel');
-    }
-    
-    // Wait for animation to finish
-    setTimeout(() => {
-      setIsSpinning(false);
-      setSelectedProvider(selectedProvider);
-      onSpinEnd(selectedProvider);
-    }, 5000); // Match with the CSS animation duration
+  const [mustSpin, setMustSpin] = useState(false);
+  const [prizeNumber, setPrizeNumber] = useState(0);
+  const providerOptions = providers.map(provider => Object.assign({option: provider.name}))
+  const providerColors = providers.map(provider => provider.color)
+
+  const handleSpinClick = () => {    
+    const newPrizeNumber = Math.floor(Math.random() * providers.length);
+    setPrizeNumber(newPrizeNumber);
+    setMustSpin(true);
   };
-  
+
+
   return (
     <div className={cn("relative mx-auto flex flex-col items-center", className)}>
-      {/* Indicator at the top */}
-      <div className="indicator bg-primary"></div>
-      
-      {/* Wheel */}
-      <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-white shadow-xl">
-        <div 
-          ref={wheelRef}
-          className={cn(
-            "w-full h-full rounded-full relative",
-            isSpinning ? "animate-spin-wheel" : "transition-all duration-300"
-          )}
-        >
-          {providers.map((provider, index) => {
-            // Assign specific colors to each provider
-            const colors = ["#4285F4", "#F80000", "#0078D4", "#00C853"];
-            const sectionColor = colors[index % colors.length];
-            
-            return (
-              <div 
-                key={provider.id}
-                className="wheel-section"
-                style={{
-                  backgroundColor: sectionColor,
-                  transform: `rotate(${index * sectionAngle}deg)`,
-                }}
-              >
-                <div 
-                  className="cloud-provider-text"
-                  style={{ transform: `translateX(-50%) rotate(${90 - (index * sectionAngle) - (sectionAngle/2)}deg)` }}
-                >
-                  {provider.name}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+
+      <Wheel
+        mustStartSpinning={mustSpin}
+        prizeNumber={prizeNumber}
+        data={providerOptions}
+        outerBorderColor={["#fff"]}
+        innerBorderColor={["#fff"]}
+        radiusLineColor={["#fff"]}
+        radiusLineWidth={[1]}
+        fontSize={32}
+        textColors={["#ffffff"]}
+        backgroundColors={providerColors}
+        onStopSpinning={() => {
+          setMustSpin(false);
+          onSpinEnd(providers.find(provider => provider.name === providerOptions[prizeNumber].option)!)
+        }}
+      />
+
       
       {/* Spin button */}
       <div className="mt-10 flex justify-center">
         <button
-          onClick={spinWheel}
-          disabled={isSpinning}
+          onClick={handleSpinClick}
+          disabled={mustSpin}
           className={cn(
             "button-shine relative px-8 py-3 rounded-full bg-primary text-primary-foreground font-medium",
             "shadow-md transition-all duration-300 transform",
             "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2",
-            isSpinning 
+            mustSpin 
               ? "opacity-70 cursor-not-allowed"
               : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0",
             "animate-fade-in"
           )}
         >
-          {isSpinning ? 'Spinning...' : 'Spin the Wheel'}
+          {mustSpin ? 'Spinning...' : 'Spin the Wheel'}
         </button>
       </div>
     </div>
