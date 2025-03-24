@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchCloudProviders } from '@/services/cloudProviderService';
 import { useQuery } from '@tanstack/react-query';
+import { Sparkles } from 'lucide-react';
 
 // Default cloud providers as fallback
 const DEFAULT_PROVIDERS: CloudProvider[] = [
@@ -24,27 +25,29 @@ const Index = () => {
   });
   
   const providers = cloudProviders || DEFAULT_PROVIDERS;
-  const [selectedProvider, setSelectedProvider] = useState<CloudProvider>(providers[0]); 
-  const [showResult, setShowResult] = useState(true);
-  const [activeTab, setActiveTab] = useState("spin");
+  const [selectedProvider, setSelectedProvider] = useState<CloudProvider | null>(null);
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("provider");
   
   // Update selectedProvider when providers are loaded
   useEffect(() => {
-    if (cloudProviders && cloudProviders.length > 0) {
+    if (cloudProviders && cloudProviders.length > 0 && !selectedProvider) {
       setSelectedProvider(cloudProviders[0]);
     }
-  }, [cloudProviders]);
+  }, [cloudProviders, selectedProvider]);
   
   const handleSpinEnd = (provider: CloudProvider) => {
     setSelectedProvider(provider);
+    toast.success(`You landed on ${provider.name}!`);
+    // Automatically switch to project tab after selecting provider
     setTimeout(() => {
-      setShowResult(true);
-      toast.success(`You landed on ${provider.name}!`);
-    }, 800);
+      setActiveTab("project");
+    }, 1500);
   };
   
-  const handleContinue = () => {
-    setShowResult(false);
+  const handleProjectSelect = (projectName: string) => {
+    setSelectedProject(projectName);
+    toast.success(`Project selected: ${projectName}`);
   };
   
   const containerVariants = {
@@ -88,64 +91,65 @@ const Index = () => {
         initial="hidden"
         animate="visible"
       >
-        <motion.div variants={itemVariants} className="text-center mb-8">
+        <motion.div variants={itemVariants} className="text-center mb-4">
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Spin to Cloud</h1>
           <p className="text-muted-foreground max-w-lg mx-auto">
             Spin the wheel to randomly select your cloud provider for your next project.
           </p>
         </motion.div>
         
+        {/* Outcome display at the top */}
+        {selectedProvider && selectedProject && (
+          <motion.div 
+            variants={itemVariants} 
+            className="glass-panel rounded-xl p-4 mb-6 text-center w-full max-w-xl"
+            style={{ backgroundColor: `${selectedProvider.color}20` }}
+          >
+            <h2 className="text-xl font-medium mb-2">Your Selection</h2>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Sparkles className="h-5 w-5" style={{ color: selectedProvider.color }} />
+              <span className="text-2xl font-bold" style={{ color: selectedProvider.color }}>
+                {selectedProvider.name}
+              </span>
+              <Sparkles className="h-5 w-5" style={{ color: selectedProvider.color }} />
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-lg font-medium">Project: {selectedProject}</span>
+            </div>
+          </motion.div>
+        )}
+        
         <Tabs 
-          defaultValue="spin" 
-          className="w-full" 
           value={activeTab} 
           onValueChange={setActiveTab}
+          className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="spin">Spin &amp; Selection</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsTrigger value="provider">Cloud Provider</TabsTrigger>
+            <TabsTrigger value="project">Project Selection</TabsTrigger>
             <TabsTrigger value="tracker">Project Tracker</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="spin">
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Spin Wheel Side */}
-              <div className="flex flex-col items-center justify-center">
-                <motion.div 
-                  variants={itemVariants} 
-                  className="flex justify-center w-full"
-                >
-                  <SpinWheel 
-                    providers={providers} 
-                    onSpinEnd={handleSpinEnd} 
-                  />
-                </motion.div>
-              </div>
-              
-              {/* Project Selection Side */}
-              <div className="flex flex-col items-center justify-center">
-                {showResult ? (
-                  <CloudProviderResult 
-                    provider={selectedProvider} 
-                    onContinue={handleContinue} 
-                  />
-                ) : (
-                  <motion.div 
-                    variants={itemVariants}
-                    className="glass-panel rounded-xl p-8 h-full flex flex-col items-center justify-center text-center"
-                  >
-                    <h2 className="text-2xl font-semibold mb-4">Project Selection</h2>
-                    <p className="text-muted-foreground mb-8">
-                      Spin the wheel on the left to select a cloud provider and get a recommended project.
-                    </p>
-                    <motion.div 
-                      whileHover={{ scale: 1.05 }}
-                      className="text-5xl font-bold text-primary/30"
-                    >
-                      ?
-                    </motion.div>
-                  </motion.div>
-                )}
-              </div>
+          <TabsContent value="provider">
+            <div className="w-full flex flex-col items-center justify-center">
+              <motion.div 
+                variants={itemVariants} 
+                className="flex justify-center w-full max-w-lg"
+              >
+                <SpinWheel 
+                  providers={providers} 
+                  onSpinEnd={handleSpinEnd} 
+                />
+              </motion.div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="project">
+            <div className="w-full flex flex-col items-center justify-center">
+              <CloudProviderResult 
+                provider={selectedProvider || providers[0]}
+                onProjectSelect={handleProjectSelect}
+              />
             </div>
           </TabsContent>
           

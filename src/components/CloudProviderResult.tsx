@@ -8,15 +8,19 @@ import { Sparkles } from 'lucide-react';
 
 interface CloudProviderResultProps {
   provider: CloudProvider;
-  onContinue: () => void;
+  onProjectSelect: (projectName: string) => void;
 }
 
-const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onContinue }) => {
+const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onProjectSelect }) => {
   const [selectedProject, setSelectedProject] = useState<CloudProject | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [speed, setSpeed] = useState(150); // Start with normal speed
-  const [hasSpun, setHasSpun] = useState(false);
+  
+  const startProjectSelection = () => {
+    setIsSelecting(true);
+    setSelectedProject(null);
+  };
   
   useEffect(() => {
     // Only run the selection animation if we're in the selecting state
@@ -34,13 +38,14 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
         // Pick a random project for the final selection
         const finalProject = getRandomProject();
         setSelectedProject(finalProject);
+        onProjectSelect(finalProject.name);
       }, 1500); // Run the slowed animation for 1.5 seconds before stopping
       
       return () => clearTimeout(finalStopTimer);
     }, stopTime);
     
     return () => clearTimeout(stopTimer);
-  }, [isSelecting]);
+  }, [isSelecting, onProjectSelect]);
   
   useEffect(() => {
     if (!isSelecting) return;
@@ -57,47 +62,23 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
     };
   }, [currentIndex, isSelecting, speed]);
 
-  // Track when the provider actually changes from its initial value
-  useEffect(() => {
-    // Check if this is not the initial render and wheel has been spun
-    if (!hasSpun && provider) {
-      setHasSpun(true);
-      setIsSelecting(true);
-    }
-  }, [provider, hasSpun]);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="glass-panel rounded-xl p-6 w-full h-full"
+      className="glass-panel rounded-xl p-6 w-full max-w-lg"
     >
-      <h2 className="text-2xl font-medium mb-2">Your Cloud Provider</h2>
+      <h2 className="text-2xl font-medium mb-6 text-center">Select a Project</h2>
       
       <div 
-        className="mt-4 mb-6 py-6 px-4 rounded-lg flex flex-col items-center justify-center gap-3"
+        className="mb-6 py-6 px-4 rounded-lg flex flex-col items-center justify-center gap-3"
         style={{ backgroundColor: `${provider.color}20` }}
-      >
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 300, 
-            damping: 15,
-            delay: 0.2
-          }}
-          className="text-4xl font-bold"
-          style={{ color: provider.color }}
-        >
-          {provider.name}
-        </motion.div>
-        
-        <div className="mt-2 w-full">
-          <h3 className="text-lg font-medium mb-2">Recommended Project</h3>
+      >        
+        <div className="w-full">
+          <h3 className="text-lg font-medium mb-4 text-center">Recommended Project</h3>
           
-          {isSelecting && hasSpun ? (
+          {isSelecting ? (
             <div className="mb-4">
               <ul className="space-y-1">
                 {CLOUD_PROJECTS.map((project, idx) => (
@@ -120,7 +101,7 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
                 ))}
               </ul>
             </div>
-          ) : hasSpun && selectedProject ? (
+          ) : selectedProject ? (
             <div className="h-14 flex items-center justify-center">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -139,11 +120,12 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
             </div>
           ) : (
             <div className="mb-4">
+              <p className="text-center mb-2">Click the button below to get a recommended project</p>
               <ul className="space-y-1">
                 {CLOUD_PROJECTS.map((project) => (
                   <li 
                     key={project.id} 
-                    className="py-1.5 px-3 rounded-md transition-colors"
+                    className="py-1.5 px-3 rounded-md transition-colors opacity-70"
                   >
                     {project.name}
                   </li>
@@ -155,18 +137,21 @@ const CloudProviderResult: React.FC<CloudProviderResultProps> = ({ provider, onC
       </div>
       
       <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        onClick={onContinue}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={startProjectSelection}
+        disabled={isSelecting}
         className={cn(
           "button-shine relative px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium",
           "shadow-md transition-all duration-300 transform",
           "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2",
-          "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 w-full"
+          isSelecting 
+            ? "opacity-70 cursor-not-allowed"
+            : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0",
+          "animate-fade-in w-full"
         )}
       >
-        Try Again
+        {isSelecting ? 'Selecting...' : selectedProject ? 'Select Another Project' : 'Find Me a Project'}
       </motion.button>
     </motion.div>
   );
