@@ -90,7 +90,9 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 }
 
@@ -102,7 +104,7 @@
     clip-path: polygon(50% 50%, 100% 0, 0 0);
     transform-origin: bottom center;
   }
-  
+
   .cloud-provider-text {
     position: absolute;
     top: 20%;
@@ -112,7 +114,7 @@
     color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
-  
+
   .indicator {
     position: absolute;
     top: -10px;
@@ -123,21 +125,21 @@
     clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
     z-index: 10;
   }
-  
+
   .glass-panel {
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
   }
-  
+
   .button-shine {
     position: relative;
     overflow: hidden;
   }
-  
+
   .button-shine::after {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     left: -50%;
@@ -153,7 +155,7 @@
     transition: all 0.6s ease-in-out;
     opacity: 0;
   }
-  
+
   .button-shine:hover::after {
     opacity: 1;
     left: 100%;

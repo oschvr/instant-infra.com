@@ -1,3 +1,3 @@
 export interface Deployment {
-    name: string;
+  name: string;
 }

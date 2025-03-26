@@ -1,77 +1,111 @@
-
-import React, { useState, useEffect } from 'react';
-import SpinWheel, { CloudProvider } from '@/components/SpinWheel';
-import CloudProviderResult from '@/components/Deployments';
-import ProjectTracker from '@/components/ProjectTracker';
-import { motion } from 'framer-motion';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import SpinWheel, { CloudProvider } from "@/components/SpinWheel";
+import CloudProviderResult from "@/components/Deployments";
+import ProjectTracker from "@/components/ProjectTracker";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchCloudProviders } from '@/services/cloudProviderService';
-import { useQuery } from '@tanstack/react-query';
-import {  } from 'lucide-react';
-import { fetchDeployments } from '@/services/deploymentsService';
-
-
+import { fetchCloudProviders } from "@/services/cloudProviderService";
+import { useQuery } from "@tanstack/react-query";
+import {} from "lucide-react";
+import { fetchDeployments } from "@/services/deploymentsService";
+import ReactConfetti from "react-confetti";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Index = () => {
-  const { data: cloudProviders, isLoading, error } = useQuery({
-    queryKey: ['cloudProviders'],
+  const {
+    data: cloudProviders,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["cloudProviders"],
     queryFn: fetchCloudProviders,
   });
 
-  const { data: deployments, } = useQuery({
-    queryKey: ['deployments'],
+  const { data: deployments } = useQuery({
+    queryKey: ["deployments"],
     queryFn: fetchDeployments,
   });
-  
+
   const providers = cloudProviders;
-  const [selectedProvider, setSelectedProvider] = useState<CloudProvider | null>(null);
+  const [selectedProvider, setSelectedProvider] =
+    useState<CloudProvider | null>(null);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("provider");
-  
+  const [showResult, setShowResult] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showProjectResult, setShowProjectResult] = useState(false);
+  const [showProjectConfetti, setShowProjectConfetti] = useState(false);
+
   // Update selectedProvider when providers are loaded
   useEffect(() => {
     if (cloudProviders && cloudProviders.length > 0 && !selectedProvider) {
       setSelectedProvider(cloudProviders[0]);
     }
   }, [cloudProviders, selectedProvider]);
-  
+
   const handleSpinEnd = (provider: CloudProvider) => {
     setSelectedProvider(provider);
-    
-    
+    setShowResult(true);
+    setShowConfetti(true);
+
+    // Hide confetti after 5 seconds
     setTimeout(() => {
+      setShowConfetti(false);
+    }, 5000);
+
+    // Switch to project tab after 3 seconds
+    setTimeout(() => {
+      setShowResult(false);
       setActiveTab("project");
-    }, 3000);
+    }, 5000);
   };
-  
+
   const handleProjectSelect = (projectName: string) => {
     setSelectedProject(projectName);
+    setShowProjectResult(true);
+    setShowProjectConfetti(true);
+
+    // Hide confetti after 5 seconds
+    setTimeout(() => {
+      setShowProjectConfetti(false);
+    }, 5000);
+
+    // Hide dialog and switch to tracker tab after 3 seconds
+    setTimeout(() => {
+      setShowProjectResult(false);
+      setActiveTab("tracker");
+    }, 5000);
   };
 
   const handleContinue = (tab: string) => {
-    setActiveTab(tab)
-  }
-  
+    setActiveTab(tab);
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         duration: 0.6,
         when: "beforeChildren",
-        staggerChildren: 0.2
-      }
-    }
+        staggerChildren: 0.2,
+      },
+    },
   };
-  
+
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
   };
 
   if (isLoading) {
@@ -88,54 +122,136 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-background to-secondary/50">
-      <motion.div 
+      {showConfetti && (
+        <ReactConfetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={500}
+        />
+      )}
+
+      {showProjectConfetti && (
+        <ReactConfetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={500}
+          colors={["#FFD700", "#FFA500", "#FF6347"]}
+        />
+      )}
+
+      <Dialog open={showResult} onOpenChange={setShowResult}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold">
+              🎉 Congratulations! 🎉
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center p-6">
+            <div className="text-4xl font-bold mb-4">
+              You got {selectedProvider?.name}!
+            </div>
+            <img
+              alt={selectedProvider?.name}
+              className="w-24 h-24 object-contain"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showProjectResult} onOpenChange={setShowProjectResult}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold">
+              🚀 Project Selected! 🚀
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center p-6">
+            <div className="text-2xl font-bold mb-4">You'll be deploying:</div>
+            <div className="text-4xl font-bold mb-4 text-primary">
+              {selectedProject}
+            </div>
+            <div className="text-xl text-muted-foreground">
+              on {selectedProvider?.name}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <motion.div
         className="container max-w-6xl mx-auto flex flex-col items-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <motion.div variants={itemVariants} className="text-center mb-4">
-          <h1 className="text-4xl font-bold mb-3 tracking-tight">Instant Infra ⚡️</h1>
-          <p className="text-muted-foreground max-w-lg py-4 mb-3">
-           Rules of the game:
-          <ul className="text-left list-disc pl-6 space-y-2">
-            <li>1. Spin the wheel to select a cloud provider</li>
-            <li>2. Choose a genering deployment</li>
-            <li>3. Record yourself doing it</li>
-            <li>4. Save progress in the progress tracker</li>
-          </ul>
-          </p>
+          <h1 className="text-4xl font-bold mb-3 tracking-tight">
+            Instant Infra ⚡️
+          </h1>
         </motion.div>
-        
-        
-        <Tabs 
-          value={activeTab} 
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
+
+        {/* New Info Tabs */}
+        <Tabs defaultValue="rules" className="w-full mb-8">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="rules">Rules</TabsTrigger>
+            <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="links">Links</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="rules">
+            <div className="text-muted-foreground max-w-lg py-4 mb-3">
+              <ul className="text-left list-disc pl-6 space-y-2">
+                <li>1. Spin the wheel to select a cloud provider</li>
+                <li>2. Choose a genering deployment</li>
+                <li>3. Record yourself doing it</li>
+                <li>4. Save progress in the progress tracker</li>
+              </ul>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="about">
+            <div className="text-muted-foreground max-w-lg py-4 mb-3">
+              {/* Left blank for you to fill */}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="links">
+            <div className="text-muted-foreground max-w-lg py-4 mb-3">
+              <ul className="text-left list-disc pl-6 space-y-2">
+                <li>
+                  <a href="#" className="text-primary hover:underline">
+                    YouTube Channel
+                  </a>
+                </li>
+                {/* Add more links as needed */}
+              </ul>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Existing Game Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="provider">Cloud Provider</TabsTrigger>
             <TabsTrigger value="project">Project Selection</TabsTrigger>
             <TabsTrigger value="tracker">Project Tracker</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="provider">
             <div className="w-full flex flex-col items-center justify-center">
-              <motion.div 
-                variants={itemVariants} 
+              <motion.div
+                variants={itemVariants}
                 className="flex justify-center w-full max-w-lg"
               >
-                <SpinWheel 
-                  providers={providers} 
-                  onSpinEnd={handleSpinEnd} 
-                />
+                <SpinWheel providers={providers} onSpinEnd={handleSpinEnd} />
               </motion.div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="project">
             <div className="w-full flex flex-col items-center justify-center">
-              <CloudProviderResult 
+              <CloudProviderResult
                 provider={selectedProvider || providers[0]}
                 deployments={deployments}
                 onProjectSelect={handleProjectSelect}
@@ -143,13 +259,12 @@ const Index = () => {
               />
             </div>
           </TabsContent>
-          
+
           <TabsContent value="tracker">
             <ProjectTracker providers={providers} deployments={deployments} />
           </TabsContent>
         </Tabs>
       </motion.div>
-      
     </div>
   );
 };
