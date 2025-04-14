@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { fetchChallenges } from "@/services/challengesService";
 
 const Index = () => {
   const {
@@ -30,6 +31,11 @@ const Index = () => {
   const { data: deployments } = useQuery({
     queryKey: ["deployments"],
     queryFn: fetchDeployments,
+  });
+
+  const { data: challenges } = useQuery({
+    queryKey: ["challenges"],
+    queryFn: fetchChallenges,
   });
 
   const providers = cloudProviders;
@@ -145,17 +151,16 @@ const Index = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center text-2xl font-bold">
-              🎉 Congratulations! 🎉
+              🎉 Cloud Provider Selected! 🎉
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-6">
-            <div className="text-4xl font-bold mb-4">
-              You got {selectedProvider?.name}!
+            <div
+              className="text-4xl font-bold mb-4"
+              style={{ color: selectedProvider?.color }}
+            >
+              You got {selectedProvider?.name} !
             </div>
-            <img
-              alt={selectedProvider?.name}
-              className="w-24 h-24 object-contain"
-            />
           </div>
         </DialogContent>
       </Dialog>
@@ -169,11 +174,18 @@ const Index = () => {
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-6">
             <div className="text-2xl font-bold mb-4">You'll be deploying:</div>
-            <div className="text-4xl font-bold mb-4 text-primary">
+            <div
+              className="text-4xl font-bold mb-4"
+              style={{ color: selectedProvider?.color }}
+            >
               {selectedProject}
             </div>
-            <div className="text-xl text-muted-foreground">
-              on {selectedProvider?.name}
+            <div className="text-2xl font-bold mb-4">on</div>
+            <div
+              className="text-4xl font-bold mb-4"
+              style={{ color: selectedProvider?.color }}
+            >
+              {selectedProvider?.name} !
             </div>
           </div>
         </DialogContent>
@@ -200,13 +212,22 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="rules">
-            <div className="text-muted-foreground max-w-lg py-4 mb-3">
+            <div className="text-muted-foreground max-w-lg py-2 mb-3">
               <ul className="text-left list-disc pl-6 space-y-2">
                 <li>1. Spin the wheel to select a cloud provider</li>
-                <li>2. Choose a genering deployment</li>
+                <li>2. Choose a deployment</li>
                 <li>3. Record yourself doing it</li>
                 <li>4. Save progress in the progress tracker</li>
               </ul>
+            </div>
+            <div className="text-muted-foreground max-w-lg py-2 mb-3">
+              <p className="text-muted-foreground pt-2">
+                * Try to do it in under 10-20 minutes
+              </p>
+              <p className="text-muted-foreground pt-2">
+                * Try not to use AI to do this, unless seriously needed
+              </p>
+              <p className="text-muted-foreground pt-2">* Have fun!</p>
             </div>
           </TabsContent>
 
@@ -240,12 +261,7 @@ const Index = () => {
 
           <TabsContent value="provider">
             <div className="w-full flex flex-col items-center justify-center">
-              <motion.div
-                variants={itemVariants}
-                className="flex justify-center w-full max-w-lg"
-              >
-                <SpinWheel providers={providers} onSpinEnd={handleSpinEnd} />
-              </motion.div>
+              <SpinWheel providers={providers} onSpinEnd={handleSpinEnd} />
             </div>
           </TabsContent>
 
@@ -261,7 +277,11 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="tracker">
-            <ProjectTracker providers={providers} deployments={deployments} />
+            <ProjectTracker
+              providers={providers}
+              deployments={deployments}
+              challenges={challenges}
+            />
           </TabsContent>
         </Tabs>
       </motion.div>

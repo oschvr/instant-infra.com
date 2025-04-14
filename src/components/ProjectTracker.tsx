@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -11,68 +11,49 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { CloudProvider } from "@/types/cloudProvider";
 import { motion } from "framer-motion";
+import { Challenge } from "@/types/challenge";
 import { Deployment } from "@/types/deployment";
 
 interface ProjectTrackerProps {
   providers: CloudProvider[];
   deployments: Deployment[];
+  challenges: Challenge[];
 }
-
-type CompletedProject = {
-  projectId: string;
-  providerId: string;
-};
 
 const ProjectTracker: React.FC<ProjectTrackerProps> = ({
   providers,
   deployments,
+  challenges,
 }) => {
-  const [completedProjects, setCompletedProjects] = useState<
-    CompletedProject[]
-  >([]);
+  const [completedProjects, setCompletedProjects] =
+    useState<typeof challenges>(challenges);
 
-  // Load completed projects from localStorage on component mount
-  useEffect(() => {
-    const savedProjects = localStorage.getItem("completedProjects");
-    if (savedProjects) {
-      setCompletedProjects(JSON.parse(savedProjects));
-    }
-  }, []);
-
-  // Save completed projects to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem(
-      "completedProjects",
-      JSON.stringify(completedProjects),
-    );
-  }, [completedProjects]);
-
-  const toggleCompleted = (projectId: string, providerId: string) => {
+  const toggleCompleted = (deploymentName: string, providerName: string) => {
     setCompletedProjects((prevState) => {
-      const existingEntry = prevState.find(
-        (entry) =>
-          entry.projectId === projectId && entry.providerId === providerId,
-      );
-
-      if (existingEntry) {
-        // Remove if already exists
-        return prevState.filter(
-          (entry) =>
-            !(entry.projectId === projectId && entry.providerId === providerId),
-        );
-      } else {
-        // Add if doesn't exist
-        return [...prevState, { projectId, providerId }];
-      }
+      return prevState.map((challenge) => {
+        if (
+          challenge.deployment_name === deploymentName &&
+          challenge.provider_name === providerName
+        ) {
+          return { ...challenge, is_done: !challenge.is_done };
+        }
+        return challenge;
+      });
     });
   };
 
-  const isCompleted = (projectId: string, providerId: string) => {
+  const isCompleted = (deploymentName: string, providerName: string) => {
     return completedProjects.some(
-      (entry) =>
-        entry.projectId === projectId && entry.providerId === providerId,
+      (challenge) =>
+        challenge.deployment_name === deploymentName &&
+        challenge.provider_name === providerName &&
+        challenge.is_done
     );
   };
+
+  const uniqueDeployments = Array.from(
+    new Set(challenges.map((c) => c.deployment_name))
+  );
 
   return (
     <Card>
@@ -87,7 +68,7 @@ const ProjectTracker: React.FC<ProjectTrackerProps> = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[250px]">Project</TableHead>
+                  <TableHead className="w-[250px]">Deployment</TableHead>
                   {providers.map((provider) => (
                     <TableHead
                       key={provider.id}
@@ -100,19 +81,19 @@ const ProjectTracker: React.FC<ProjectTrackerProps> = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {deployments.map((project) => (
-                  <TableRow key={project.name}>
+                {uniqueDeployments.map((deploymentName) => (
+                  <TableRow key={deploymentName}>
                     <TableCell className="font-medium">
-                      {project.name}
+                      {deploymentName}
                     </TableCell>
                     {providers.map((provider) => (
                       <TableCell key={provider.id} className="text-center">
                         <div className="flex justify-center">
                           <Checkbox
-                            id={`${project.name}-${provider.id}`}
-                            checked={isCompleted(project.name, provider.id)}
+                            id={`${deploymentName}-${provider.name}`}
+                            checked={isCompleted(deploymentName, provider.name)}
                             onCheckedChange={() =>
-                              toggleCompleted(project.name, provider.id)
+                              toggleCompleted(deploymentName, provider.name)
                             }
                             className="data-[state=checked]:bg-[--provider-color] data-[state=checked]:border-[--provider-color]"
                             style={

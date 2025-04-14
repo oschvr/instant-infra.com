@@ -9,7 +9,6 @@ export async function fetchCloudProviders(): Promise<CloudProvider[]> {
       console.error("Error fetching cloud providers:", error);
       throw error;
     }
-
     return data || [];
   } catch (error) {
     console.error("Failed to fetch cloud providers:", error);

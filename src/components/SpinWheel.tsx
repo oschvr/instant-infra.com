@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Wheel } from "react-custom-roulette";
 import { CloudProvider } from "@/types/cloudProvider";
+import { Card, CardContent } from "./ui/card";
+import { motion } from "framer-motion";
 
 interface SpinWheelProps {
   providers: CloudProvider[];
@@ -17,7 +19,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const providerOptions = providers.map((provider) =>
-    Object.assign({ option: provider.name }),
+    Object.assign({ option: provider.name })
   );
   const providerColors = providers.map((provider) => provider.color);
 
@@ -28,50 +30,52 @@ const SpinWheel: React.FC<SpinWheelProps> = ({
   };
 
   return (
-    <div
-      className={cn("relative mx-auto flex flex-col items-center", className)}
-    >
-      <Wheel
-        mustStartSpinning={mustSpin}
-        prizeNumber={prizeNumber}
-        data={providerOptions}
-        outerBorderColor={["#fff"]}
-        innerBorderColor={["#fff"]}
-        radiusLineColor={["#fff"]}
-        radiusLineWidth={[1]}
-        fontSize={32}
-        textColors={["#ffffff"]}
-        backgroundColors={providerColors}
-        onStopSpinning={() => {
-          setMustSpin(false);
-          onSpinEnd(
-            providers.find(
-              (provider) =>
-                provider.name === providerOptions[prizeNumber].option,
-            )!,
-          );
-        }}
-      />
-
-      {/* Spin button */}
-      <div className="mt-10 flex justify-center">
-        <button
-          onClick={handleSpinClick}
-          disabled={mustSpin}
+    <Card className="w-full">
+      <CardContent>
+        <div
           className={cn(
-            "button-shine relative px-8 py-3 rounded-full bg-primary text-primary-foreground font-medium",
-            "shadow-md transition-all duration-300 transform",
-            "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2",
-            mustSpin
-              ? "opacity-70 cursor-not-allowed"
-              : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0",
-            "animate-fade-in",
+            "relative mx-auto flex flex-col items-center py-8",
+            className
           )}
         >
-          {mustSpin ? "Spinning..." : "Spin the Wheel"}
-        </button>
-      </div>
-    </div>
+          <Wheel
+            mustStartSpinning={mustSpin}
+            prizeNumber={prizeNumber}
+            data={providerOptions}
+            outerBorderColor={["#fff"]}
+            innerBorderColor={["#fff"]}
+            radiusLineColor={["#fff"]}
+            radiusLineWidth={[1]}
+            fontSize={32}
+            textColors={["#ffffff"]}
+            backgroundColors={providerColors}
+            onStopSpinning={() => {
+              setMustSpin(false);
+              onSpinEnd(
+                providers.find(
+                  (provider) =>
+                    provider.name === providerOptions[prizeNumber].option
+                )!
+              );
+            }}
+          />
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            disabled={mustSpin}
+            onClick={handleSpinClick}
+            className={cn(
+              "button-shine relative px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium w-full mt-8",
+              "shadow-md transition-all duration-300 transform",
+              mustSpin ? "opacity-70 cursor-not-allowed" : "hover:shadow-lg"
+            )}
+          >
+            {mustSpin ? "Spinning..." : "Spin the Wheel"}
+          </motion.button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
