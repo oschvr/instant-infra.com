@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { Login } from "./components/Login";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Navbar } from "./components/Navbar";
 
 const queryClient = new QueryClient();
 
@@ -14,11 +17,23 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className="min-h-screen bg-gray-50">
+          <Navbar />
+          <main className="py-10">
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

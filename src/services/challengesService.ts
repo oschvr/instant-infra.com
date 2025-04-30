@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase";
 import { Challenge } from "@/types/challenge";
-import { log } from "console";
 
 export async function fetchChallenges(): Promise<Challenge[]> {
   const { data, error } = await supabase
@@ -41,41 +40,12 @@ export async function updateChallengeStatus(
   challengeId: string,
   isDone: boolean,
 ): Promise<boolean> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  console.log("Current user:", user?.id);
-  console.log("Attempting to update challenge:", { challengeId, isDone });
-
-  // First verify the challenge exists
-  const { data: existingChallenge, error: fetchError } = await supabase
-    .from("challenges")
-    .select()
-    .eq("id", challengeId)
-    .single();
-
-  if (fetchError) {
-    console.error("Error fetching challenge:", fetchError);
-    return false;
-  }
-
-  if (!existingChallenge) {
-    console.error("Challenge not found:", challengeId);
-    return false;
-  }
-
   const { data, error } = await supabase
     .from("challenges")
     .update({ is_done: isDone })
     .eq("id", challengeId)
     .select();
 
-  if (error) {
-    console.error("Error updating challenge status:", error);
-    return false;
-  }
-
-  const wasUpdated = data && data.length > 0;
-  console.log("Update response:", { data, wasUpdated });
-  return wasUpdated;
+  if (error) return false;
+  return data && data.length > 0;
 }
