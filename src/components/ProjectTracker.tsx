@@ -13,6 +13,7 @@ import { CloudProvider } from "@/types/cloudProvider";
 import { motion } from "framer-motion";
 import { Challenge } from "@/types/challenge";
 import { Deployment } from "@/types/deployment";
+import { updateChallengeStatus } from "@/services/challengesService";
 
 interface ProjectTrackerProps {
   providers: CloudProvider[];
@@ -22,24 +23,40 @@ interface ProjectTrackerProps {
 
 const ProjectTracker: React.FC<ProjectTrackerProps> = ({
   providers,
-  deployments,
   challenges,
 }) => {
   const [completedProjects, setCompletedProjects] =
     useState<typeof challenges>(challenges);
 
-  const toggleCompleted = (deploymentName: string, providerName: string) => {
-    setCompletedProjects((prevState) => {
-      return prevState.map((challenge) => {
-        if (
-          challenge.deployment_name === deploymentName &&
-          challenge.provider_name === providerName
-        ) {
-          return { ...challenge, is_done: !challenge.is_done };
-        }
-        return challenge;
+  const toggleCompleted = async (
+    deploymentName: string,
+    providerName: string,
+  ) => {
+    const challenge = completedProjects.find(
+      (c) =>
+        c.deployment_name === deploymentName &&
+        c.provider_name === providerName,
+    );
+
+    if (!challenge) return;
+
+    const success = await updateChallengeStatus(
+      challenge.id,
+      !challenge.is_done,
+    );
+
+    console.log(success);
+
+    if (success) {
+      setCompletedProjects((prevState) => {
+        return prevState.map((c) => {
+          if (c.id === challenge.id) {
+            return { ...c, is_done: !c.is_done };
+          }
+          return c;
+        });
       });
-    });
+    }
   };
 
   const isCompleted = (deploymentName: string, providerName: string) => {
@@ -47,12 +64,12 @@ const ProjectTracker: React.FC<ProjectTrackerProps> = ({
       (challenge) =>
         challenge.deployment_name === deploymentName &&
         challenge.provider_name === providerName &&
-        challenge.is_done
+        challenge.is_done,
     );
   };
 
   const uniqueDeployments = Array.from(
-    new Set(challenges.map((c) => c.deployment_name))
+    new Set(challenges.map((c) => c.deployment_name)),
   );
 
   return (
