@@ -25,7 +25,13 @@ export function Navbar() {
               href="/"
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
             >
-              Home
+              Project Tracker
+            </a>
+            <a
+              href="/game"
+              className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+            >
+              Game
             </a>
             <a
               href="/about"

@@ -8,6 +8,8 @@ import NotFound from "./pages/NotFound";
 import { Login } from "./components/Login";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Navbar } from "./components/Navbar";
+import PublicProjectTracker from "@/components/PublicProjectTracker";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -17,13 +19,15 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
           <Navbar />
           <main className="py-10">
             <Routes>
+              <Route path="/" element={<PublicProjectTracker />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/about" element={<About />} />
               <Route
-                path="/"
+                path="/game"
                 element={
                   <ProtectedRoute>
                     <Index />
