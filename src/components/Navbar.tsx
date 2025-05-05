@@ -33,12 +33,12 @@ export function Navbar() {
             >
               Game
             </a>
-            {/* <a
+            <a
               href="/about"
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
             >
               About
-            </a> */}
+            </a>
           </nav>
         </div>
         <div className="flex items-center gap-4">
