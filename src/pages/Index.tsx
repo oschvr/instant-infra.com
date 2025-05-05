@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import SpinWheel, { CloudProvider } from "@/components/SpinWheel";
+import SpinWheel from "@/components/SpinWheel";
 import CloudProviderResult from "@/components/Deployments";
 import ProjectTracker from "@/components/ProjectTracker";
 import { motion } from "framer-motion";
@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { fetchChallenges } from "@/services/challengesService";
+import { CloudProvider } from "@/types/cloudProvider";
 
 const Index = () => {
   const {
@@ -38,11 +39,10 @@ const Index = () => {
     queryFn: fetchChallenges,
   });
 
-  const providers = cloudProviders;
   const [selectedProvider, setSelectedProvider] =
     useState<CloudProvider | null>(null);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("provider");
+  const [activeTab, setActiveTab] = useState("tracker");
   const [showResult, setShowResult] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showProjectResult, setShowProjectResult] = useState(false);
@@ -89,10 +89,6 @@ const Index = () => {
     }, 5000);
   };
 
-  const handleContinue = (tab: string) => {
-    setActiveTab(tab);
-  };
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -116,7 +112,7 @@ const Index = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="container min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
@@ -127,7 +123,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-background to-secondary/50">
+    <main className="min-h-screen flex flex-col bg-background">
       {showConfetti && (
         <ReactConfetti
           width={window.innerWidth}
@@ -148,144 +144,118 @@ const Index = () => {
       )}
 
       <Dialog open={showResult} onOpenChange={setShowResult}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="glass-panel sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold">
+            <DialogTitle className="text-center text-2xl font-bold gradient-text">
               🎉 Cloud Provider Selected! 🎉
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-6">
             <div
-              className="text-4xl font-bold mb-4"
+              className="text-4xl font-bold mb-4 animate-fade-in"
               style={{ color: selectedProvider?.color }}
             >
-              You got {selectedProvider?.name} !
+              You got {selectedProvider?.name}!
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showProjectResult} onOpenChange={setShowProjectResult}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="glass-panel sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold">
+            <DialogTitle className="text-center text-2xl font-bold gradient-text">
               🚀 Project Selected! 🚀
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-6">
-            <div className="text-2xl font-bold mb-4">You'll be deploying:</div>
-            <div
-              className="text-4xl font-bold mb-4"
-              style={{ color: selectedProvider?.color }}
-            >
+            <div className="text-2xl font-bold mb-4 text-muted-foreground">
+              You'll be deploying:
+            </div>
+            <div className="text-4xl font-bold mb-4 gradient-text animate-fade-in">
               {selectedProject}
             </div>
-            <div className="text-2xl font-bold mb-4">on</div>
+            <div className="text-2xl font-bold mb-4 text-muted-foreground">
+              on
+            </div>
             <div
-              className="text-4xl font-bold mb-4"
+              className="text-4xl font-bold mb-4 animate-fade-in"
               style={{ color: selectedProvider?.color }}
             >
-              {selectedProvider?.name} !
+              {selectedProvider?.name}!
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      <motion.div
-        className="container max-w-6xl mx-auto flex flex-col items-center"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.div variants={itemVariants} className="text-center mb-4">
-          <h1 className="text-4xl font-bold mb-3 tracking-tight">
-            Instant Infra ⚡️
-          </h1>
+      <div className="container py-8">
+        <motion.div
+          className="max-w-6xl mx-auto"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={itemVariants} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
+              <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8 bg-secondary/50 p-1 rounded-lg">
+                <TabsTrigger
+                  value="tracker"
+                  className="rounded-md px-3 py-1.5 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                >
+                  Tracker
+                </TabsTrigger>
+                <TabsTrigger
+                  value="provider"
+                  className="rounded-md px-3 py-1.5 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                >
+                  Cloud Provider
+                </TabsTrigger>
+                <TabsTrigger
+                  value="project"
+                  className="rounded-md px-3 py-1.5 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                >
+                  Project
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="provider" className="mt-8">
+                <div className="bg-card/50 border border-border/50 rounded-lg p-8">
+                  <SpinWheel
+                    providers={cloudProviders || []}
+                    onSpinEnd={handleSpinEnd}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="project" className="mt-8">
+                <div className="bg-card/50 border border-border/50 rounded-lg p-8">
+                  <CloudProviderResult
+                    provider={selectedProvider!}
+                    deployments={deployments || []}
+                    onProjectSelect={handleProjectSelect}
+                    onClickContinue={() => setActiveTab("tracker")}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="tracker" className="mt-8">
+                <div className="bg-card/50 border border-border/50 rounded-lg p-8">
+                  <ProjectTracker
+                    providers={cloudProviders || []}
+                    deployments={deployments || []}
+                    challenges={challenges || []}
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </motion.div>
         </motion.div>
-
-        {/* New Info Tabs */}
-        <Tabs defaultValue="rules" className="w-full mb-8">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="rules">Rules</TabsTrigger>
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="links">Links</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="rules">
-            <div className="text-muted-foreground max-w-lg py-2 mb-3">
-              <ul className="text-left list-disc pl-6 space-y-2">
-                <li>1. Spin the wheel to select a cloud provider</li>
-                <li>2. Choose a deployment</li>
-                <li>3. Record yourself doing it</li>
-                <li>4. Save progress in the progress tracker</li>
-              </ul>
-            </div>
-            <div className="text-muted-foreground max-w-lg py-2 mb-3">
-              <p className="text-muted-foreground pt-2">
-                * Try to do it in under 10-20 minutes
-              </p>
-              <p className="text-muted-foreground pt-2">
-                * Try not to use AI to do this, unless seriously needed
-              </p>
-              <p className="text-muted-foreground pt-2">* Have fun!</p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="about">
-            <div className="text-muted-foreground max-w-lg py-4 mb-3">
-              {/* Left blank for you to fill */}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="links">
-            <div className="text-muted-foreground max-w-lg py-4 mb-3">
-              <ul className="text-left list-disc pl-6 space-y-2">
-                <li>
-                  <a href="#" className="text-primary hover:underline">
-                    YouTube Channel
-                  </a>
-                </li>
-                {/* Add more links as needed */}
-              </ul>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        {/* Existing Game Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="provider">Cloud Provider</TabsTrigger>
-            <TabsTrigger value="project">Project Selection</TabsTrigger>
-            <TabsTrigger value="tracker">Project Tracker</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="provider">
-            <div className="w-full flex flex-col items-center justify-center">
-              <SpinWheel providers={providers} onSpinEnd={handleSpinEnd} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="project">
-            <div className="w-full flex flex-col items-center justify-center">
-              <CloudProviderResult
-                provider={selectedProvider || providers[0]}
-                deployments={deployments}
-                onProjectSelect={handleProjectSelect}
-                onClickContinue={handleContinue}
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="tracker">
-            <ProjectTracker
-              providers={providers}
-              deployments={deployments}
-              challenges={challenges}
-            />
-          </TabsContent>
-        </Tabs>
-      </motion.div>
-    </div>
+      </div>
+    </main>
   );
 };
 

@@ -12,36 +12,52 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold">Your App</span>
-            </div>
-          </div>
-          <div className="flex items-center">
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-700">Welcome, {user.email}</span>
-                <button
-                  onClick={handleLogout}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container h-14 flex items-center">
+        <div className="flex items-center gap-8 flex-1">
+          <a href="/" className="flex items-center gap-2">
+            <span className="text-xl font-bold">
+              <span className="gradient-text">InstantInfra</span>
+            </span>
+          </a>
+          <nav className="hidden md:flex items-center gap-6">
+            <a
+              href="/"
+              className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+            >
+              Home
+            </a>
+            <a
+              href="/about"
+              className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+            >
+              About
+            </a>
+          </nav>
+        </div>
+        <div className="flex items-center gap-4">
+          {user ? (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-foreground/60 hidden sm:inline">
+                {user.email}
+              </span>
               <button
-                onClick={() => navigate("/login")}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={handleLogout}
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
               >
-                Login
+                Logout
               </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate("/login")}
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+            >
+              Login
+            </button>
+          )}
         </div>
       </div>
-    </nav>
+    </header>
   );
 }
