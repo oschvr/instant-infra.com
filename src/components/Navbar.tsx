@@ -12,7 +12,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-card backdrop-blur supports-[backdrop-filter]:bg-card">
       <div className="container h-14 flex items-center">
         <div className="flex items-center gap-8 flex-1">
           <a href="/" className="flex items-center gap-2">
@@ -21,24 +21,24 @@ export function Navbar() {
             </span>
           </a>
           <nav className="hidden md:flex items-center gap-6">
-            <a
+            {/* <a
               href="/"
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
             >
               Project Tracker
-            </a>
+            </a> */}
             <a
               href="/game"
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
             >
               Game
             </a>
-            <a
+            {/* <a
               href="/about"
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
             >
               About
-            </a>
+            </a> */}
           </nav>
         </div>
         <div className="flex items-center gap-4">

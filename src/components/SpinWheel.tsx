@@ -4,6 +4,7 @@ import { Wheel } from "react-custom-roulette";
 import { CloudProvider } from "@/types/cloudProvider";
 import { Card, CardContent } from "./ui/card";
 import { motion } from "framer-motion";
+import { Button } from "./ui/button";
 
 interface SpinWheelProps {
   providers: CloudProvider[];
@@ -54,7 +55,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({
         <div
           className={cn(
             "relative mx-auto flex flex-col items-center py-8",
-            className,
+            className
           )}
         >
           {wheelData.length > 0 && (
@@ -79,21 +80,25 @@ const SpinWheel: React.FC<SpinWheelProps> = ({
             />
           )}
 
-          <motion.button
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            disabled={mustSpin || wheelData.length === 0}
-            onClick={handleSpinClick}
-            className={cn(
-              "button-shine relative px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium w-full mt-8",
-              "shadow-md transition-all duration-300 transform",
-              mustSpin || wheelData.length === 0
-                ? "opacity-70 cursor-not-allowed"
-                : "hover:shadow-lg",
-            )}
+            className="w-full mt-8"
           >
-            {mustSpin ? "Spinning..." : "Spin the Wheel"}
-          </motion.button>
+            <Button
+              disabled={mustSpin || wheelData.length === 0}
+              onClick={handleSpinClick}
+              className={cn(
+                "button-shine w-full shadow-md transition-all duration-300 transform",
+                mustSpin || wheelData.length === 0
+                  ? "opacity-70 cursor-not-allowed"
+                  : "hover:shadow-lg"
+              )}
+              size="lg"
+            >
+              {mustSpin ? "Spinning..." : "Spin the Wheel"}
+            </Button>
+          </motion.div>
         </div>
       </CardContent>
     </Card>

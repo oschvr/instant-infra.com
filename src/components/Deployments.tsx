@@ -4,6 +4,7 @@ import { CloudProvider } from "@/types/cloudProvider";
 import { Deployment } from "@/types/deployment";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "./ui/card";
+import { Button } from "./ui/button";
 
 interface DeploymentsProps {
   provider: CloudProvider;
@@ -75,28 +76,39 @@ const Deployments: React.FC<DeploymentsProps> = ({
         </div>
 
         {!selectedProject ? (
-          <motion.button
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={startProjectSelection}
-            disabled={isSelecting}
-            className={cn(
-              "button-shine relative px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium w-full",
-              "shadow-md transition-all duration-300 transform",
-              isSelecting ? "opacity-70 cursor-not-allowed" : "hover:shadow-lg"
-            )}
+            className="w-full"
           >
-            Find Me a Project
-          </motion.button>
+            <Button
+              onClick={startProjectSelection}
+              disabled={isSelecting}
+              className={cn(
+                "button-shine w-full shadow-md transition-all duration-300 transform",
+                isSelecting
+                  ? "opacity-70 cursor-not-allowed"
+                  : "hover:shadow-lg"
+              )}
+              size="lg"
+            >
+              Find Me a Project
+            </Button>
+          </motion.div>
         ) : (
-          <motion.button
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => onClickContinue("tracker")}
-            className="button-shine relative px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium w-full shadow-md"
+            className="w-full"
           >
-            Continue
-          </motion.button>
+            <Button
+              onClick={() => onClickContinue("tracker")}
+              className="button-shine w-full shadow-md"
+              size="lg"
+            >
+              Continue
+            </Button>
+          </motion.div>
         )}
       </CardContent>
     </Card>

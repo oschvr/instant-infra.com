@@ -30,19 +30,18 @@ const ProjectTracker: React.FC<ProjectTrackerProps> = ({
 
   const toggleCompleted = async (
     deploymentName: string,
-    providerName: string,
+    providerName: string
   ) => {
     const challenge = completedProjects.find(
       (c) =>
-        c.deployment_name === deploymentName &&
-        c.provider_name === providerName,
+        c.deployment_name === deploymentName && c.provider_name === providerName
     );
 
     if (!challenge) return;
 
     const success = await updateChallengeStatus(
       challenge.id,
-      !challenge.is_done,
+      !challenge.is_done
     );
 
     console.log(success);
@@ -64,23 +63,31 @@ const ProjectTracker: React.FC<ProjectTrackerProps> = ({
       (challenge) =>
         challenge.deployment_name === deploymentName &&
         challenge.provider_name === providerName &&
-        challenge.is_done,
+        challenge.is_done
     );
   };
 
   const uniqueDeployments = Array.from(
-    new Set(challenges.map((c) => c.deployment_name)),
+    new Set(challenges.map((c) => c.deployment_name))
   );
 
   return (
-    <Card>
-      <CardContent>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="w-full max-w-5xl mx-auto mt-12 px-4"
-        >
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="max-w-6xl mx-auto mt-12 px-4"
+    >
+      {/* <div className="w-full max-w-md mx-auto animate-fade-in">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">
+            Welcome to <span className="gradient-text">InstantInfra</span>
+          </h1>
+        </div>
+      </div> */}
+
+      <Card className="w-full">
+        <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -127,9 +134,9 @@ const ProjectTracker: React.FC<ProjectTrackerProps> = ({
               </TableBody>
             </Table>
           </div>
-        </motion.div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 

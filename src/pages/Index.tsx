@@ -223,33 +223,27 @@ const Index = () => {
               </TabsList>
 
               <TabsContent value="provider" className="mt-8">
-                <div className="bg-card/50 border border-border/50 rounded-lg p-8">
-                  <SpinWheel
-                    providers={cloudProviders || []}
-                    onSpinEnd={handleSpinEnd}
-                  />
-                </div>
+                <SpinWheel
+                  providers={cloudProviders || []}
+                  onSpinEnd={handleSpinEnd}
+                />
               </TabsContent>
 
               <TabsContent value="project" className="mt-8">
-                <div className="bg-card/50 border border-border/50 rounded-lg p-8">
-                  <CloudProviderResult
-                    provider={selectedProvider!}
-                    deployments={deployments || []}
-                    onProjectSelect={handleProjectSelect}
-                    onClickContinue={() => setActiveTab("tracker")}
-                  />
-                </div>
+                <CloudProviderResult
+                  provider={selectedProvider!}
+                  deployments={deployments || []}
+                  onProjectSelect={handleProjectSelect}
+                  onClickContinue={() => setActiveTab("tracker")}
+                />
               </TabsContent>
 
               <TabsContent value="tracker" className="mt-8">
-                <div className="bg-card/50 border border-border/50 rounded-lg p-8">
-                  <ProjectTracker
-                    providers={cloudProviders || []}
-                    deployments={deployments || []}
-                    challenges={challenges || []}
-                  />
-                </div>
+                <ProjectTracker
+                  providers={cloudProviders || []}
+                  deployments={deployments || []}
+                  challenges={challenges || []}
+                />
               </TabsContent>
             </Tabs>
           </motion.div>

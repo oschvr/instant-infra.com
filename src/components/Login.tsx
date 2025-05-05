@@ -39,11 +39,7 @@ export function Login() {
           <h1 className="text-3xl font-bold mb-2">
             Welcome to <span className="gradient-text">Instant Infra</span>
           </h1>
-          <p className="text-muted-foreground">
-            {isSignUp
-              ? "Create an account to get started"
-              : "Sign in to your account"}
-          </p>
+          <p className="text-muted-foreground">{"Login to your account"}</p>
         </div>
 
         <div className="card p-6">
@@ -80,19 +76,9 @@ export function Login() {
               </div>
             )}
             <button type="submit" className="btn btn-primary w-full">
-              {isSignUp ? "Create Account" : "Sign In"}
+              Login
             </button>
           </form>
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {isSignUp
-                ? "Already have an account? Sign in"
-                : "Don't have an account? Create one"}
-            </button>
-          </div>
         </div>
       </div>
     </div>
