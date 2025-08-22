@@ -1,61 +1,124 @@
-# Welcome to your Lovable project
+# Instant Infra
 
-## Project info
+A modern web application for tracking cloud infrastructure deployments and challenges.
 
-**URL**: https://lovable.dev/projects/e6cb1d26-3f18-468d-a7c0-f58809db7fc3
+## Features
 
-## How can I edit this code?
+- **Project Tracker**: Monitor cloud infrastructure projects and their completion status
+- **Cloud Provider Support**: AWS, GCP, Azure, and Oracle Cloud
+- **Deployment Tracking**: Track various deployment types (EC2, Compute Engine, VMs, etc.)
+- **Interactive Game**: Spin wheel game for project selection
+- **Local Database**: Uses local JSON data for development and deployment
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI Components**: Radix UI + Tailwind CSS
+- **State Management**: React Query + Context API
+- **Database**: Local JSON database (no external dependencies)
+- **Routing**: React Router DOM
+- **Build Tool**: Vite
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e6cb1d26-3f18-468d-a7c0-f58809db7fc3) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 18+
+- npm or yarn
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository:
 
-Follow these steps:
+```bash
+git clone <repository-url>
+cd instant-infra.com
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. Install dependencies:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. Start the development server:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+4. Open your browser and navigate to `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Building for Production
 
-**Use GitHub Codespaces**
+```bash
+npm run build
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The built files will be in the `dist/` directory.
 
-## What technologies are used for this project?
+## Local Database
 
-This project is built with .
+The application uses a local JSON database located in `src/lib/localDatabase.ts`. This file contains:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Challenges**: Infrastructure deployment challenges with completion status
+- **Cloud Providers**: Supported cloud service providers (AWS, GCP, Azure, Oracle)
+- **Deployments**: Various deployment types for each provider
+
+### Data Structure
+
+```typescript
+interface Challenge {
+  id: string;
+  provider_name: string;
+  deployment_name: string;
+  is_done: boolean;
+  created_at: string;
+}
+
+interface CloudProvider {
+  id: string;
+  name: string;
+  color: string;
+}
+
+interface Deployment {
+  id: string;
+  name: string;
+  provider_id: string;
+}
+```
+
+### Adding New Data
+
+To add new challenges, providers, or deployments, edit the `localData` object in `src/lib/localDatabase.ts`.
+
+## Project Structure
+
+```
+src/
+├── components/          # React components
+├── contexts/           # React contexts (Auth, etc.)
+├── hooks/              # Custom React hooks
+├── lib/                # Utilities and local database
+├── pages/              # Page components
+├── services/           # Data services
+├── types/              # TypeScript type definitions
+└── ui/                 # Reusable UI components
+```
+
+## Authentication
+
+The application includes a simple local authentication system that simulates user login/logout functionality. In a production environment, you can replace this with your preferred authentication provider.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.

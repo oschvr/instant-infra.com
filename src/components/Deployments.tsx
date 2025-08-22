@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 interface DeploymentsProps {
   provider: CloudProvider;
   deployments: Deployment[];
-  onProjectSelect: (projectName: string) => void;
+  onProjectSelect: (deployment: Deployment) => void;
   onClickContinue: (tab: string) => void;
 }
 
@@ -20,7 +20,7 @@ const Deployments: React.FC<DeploymentsProps> = ({
   onClickContinue,
 }) => {
   const [selectedProject, setSelectedProject] = useState<Deployment | null>(
-    null
+    null,
   );
   const [isSelecting, setIsSelecting] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,7 +42,7 @@ const Deployments: React.FC<DeploymentsProps> = ({
       setSelectedProject(finalProject);
       setIsSelecting(false);
       setTimeout(() => {
-        onProjectSelect(finalProject.name);
+        onProjectSelect(finalProject);
       }, 1000);
     }, 5000);
   };
@@ -60,7 +60,9 @@ const Deployments: React.FC<DeploymentsProps> = ({
                   idx === currentIndex && isSelecting
                     ? "bg-primary/30 font-medium"
                     : "",
-                  project === selectedProject ? "bg-primary/20 font-medium" : ""
+                  project === selectedProject
+                    ? "bg-primary/20 font-medium"
+                    : "",
                 )}
                 animate={
                   (idx === currentIndex && isSelecting) ||
@@ -88,7 +90,7 @@ const Deployments: React.FC<DeploymentsProps> = ({
                 "button-shine w-full shadow-md transition-all duration-300 transform",
                 isSelecting
                   ? "opacity-70 cursor-not-allowed"
-                  : "hover:shadow-lg"
+                  : "hover:shadow-lg",
               )}
               size="lg"
             >

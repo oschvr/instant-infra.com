@@ -1,14 +1,21 @@
-import { useAuth } from "../contexts/AuthContext";
-import { signOut } from "../lib/supabase";
-import { useNavigate } from "react-router-dom";
+import { localDatabase } from "@/lib/localDatabase";
 
 export function Navbar() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await signOut();
-    navigate("/login");
+  const handleExportData = async () => {
+    try {
+      const data = await localDatabase.exportData();
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "localData.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error exporting data:", error);
+    }
   };
 
   return (
@@ -21,12 +28,6 @@ export function Navbar() {
             </span>
           </a>
           <nav className="hidden md:flex items-center gap-6">
-            {/* <a
-              href="/"
-              className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
-            >
-              Project Tracker
-            </a> */}
             <a
               href="/game"
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
@@ -39,29 +40,13 @@ export function Navbar() {
             >
               About
             </a>
-          </nav>
-        </div>
-        <div className="flex items-center gap-4">
-          {user ? (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-foreground/60 hidden sm:inline">
-                {user.email}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
             <button
-              onClick={() => navigate("/login")}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+              className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+              onClick={handleExportData}
             >
-              Login
+              Export Data
             </button>
-          )}
+          </nav>
         </div>
       </div>
     </header>

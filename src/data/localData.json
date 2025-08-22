@@ -1,0 +1,100 @@
+{
+  "challenges": [
+    {
+      "id": "1",
+      "provider_id": "aws",
+      "deployment_id": "basic-vm",
+      "is_done": false,
+      "created_at": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "2",
+      "provider_id": "gcp",
+      "deployment_id": "static-website",
+      "is_done": true,
+      "created_at": "2024-01-02T00:00:00Z"
+    },
+    {
+      "id": "3",
+      "provider_id": "azure",
+      "deployment_id": "database",
+      "is_done": false,
+      "created_at": "2024-01-03T00:00:00Z"
+    },
+    {
+      "id": "4",
+      "provider_id": "aws",
+      "deployment_id": "storage-bucket",
+      "is_done": true,
+      "created_at": "2024-01-03T00:00:00Z"
+    }
+  ],
+  "providers": [
+    {
+      "id": "aws",
+      "name": "AWS",
+      "color": "#FF9900"
+    },
+    {
+      "id": "gcp",
+      "name": "GCP",
+      "color": "#4285F4"
+    },
+    {
+      "id": "azure",
+      "name": "Azure",
+      "color": "#0078D4"
+    },
+    {
+      "id": "oracle",
+      "name": "Oracle",
+      "color": "#F80000"
+    }
+  ],
+  "deployments": [
+    {
+      "id": "kubernetes-cluster",
+      "name": "Kubernetes Cluster"
+    },
+    {
+      "id": "basic-vm",
+      "name": "Basic VM"
+    },
+    {
+      "id": "static-website",
+      "name": "Static Website"
+    },
+    {
+      "id": "database",
+      "name": "Database"
+    },
+    {
+      "id": "storage-bucket",
+      "name": "Storage bucket"
+    },
+    {
+      "id": "message-queue",
+      "name": "Message Queue"
+    },
+    {
+      "id": "container-registry",
+      "name": "Container Registry"
+    },
+    {
+      "id": "argocd",
+      "name": "K8S: ArgoCD"
+    },
+    {
+      "id": "ingress-nginx",
+      "name": "K8S: Ingress Nginx"
+    },
+    {
+      "id": "eck-stack",
+      "name": "K8S: ECK Stack"
+    },
+    {
+      "id": "kube-prometheus-stack",
+      "name": "K8S: Kube Prometheus Stack"
+    }
+  ]
+}

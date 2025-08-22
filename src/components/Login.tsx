@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { signIn, signUp } from "../lib/supabase";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -8,7 +7,7 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { user, signIn, signUp: signUpAuth } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,7 +22,7 @@ export function Login() {
 
     try {
       const { error } = isSignUp
-        ? await signUp(email, password)
+        ? await signUpAuth(email, password)
         : await signIn(email, password);
 
       if (error) throw error;

@@ -1,29 +1,10 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import ProjectTracker from "./ProjectTracker";
-import { fetchCloudProviders } from "@/services/cloudProviderService";
-import { fetchDeployments } from "@/services/deploymentsService";
 import { fetchChallenges } from "@/services/challengesService";
+import { fetchCloudProviders } from "@/services/cloudProviderService";
 
 const PublicProjectTracker = () => {
-  const {
-    data: cloudProviders,
-    isLoading: isLoadingProviders,
-    error: providersError,
-  } = useQuery({
-    queryKey: ["cloudProviders"],
-    queryFn: fetchCloudProviders,
-  });
-
-  const {
-    data: deployments,
-    isLoading: isLoadingDeployments,
-    error: deploymentsError,
-  } = useQuery({
-    queryKey: ["deployments"],
-    queryFn: fetchDeployments,
-  });
-
   const {
     data: challenges,
     isLoading: isLoadingChallenges,
@@ -33,7 +14,16 @@ const PublicProjectTracker = () => {
     queryFn: fetchChallenges,
   });
 
-  if (isLoadingProviders || isLoadingDeployments || isLoadingChallenges) {
+  const {
+    data: cloudProviders,
+    isLoading: isLoadingProviders,
+    error: providersError,
+  } = useQuery({
+    queryKey: ["cloudProviders"],
+    queryFn: fetchCloudProviders,
+  });
+
+  if (isLoadingChallenges || isLoadingProviders) {
     return (
       <div className="container min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -41,7 +31,7 @@ const PublicProjectTracker = () => {
     );
   }
 
-  if (providersError || deploymentsError || challengesError) {
+  if (challengesError || providersError) {
     return (
       <div className="container min-h-screen flex items-center justify-center">
         <div className="text-destructive">
@@ -53,9 +43,8 @@ const PublicProjectTracker = () => {
 
   return (
     <ProjectTracker
-      providers={cloudProviders || []}
-      deployments={deployments || []}
       challenges={challenges || []}
+      providers={cloudProviders || []}
     />
   );
 };

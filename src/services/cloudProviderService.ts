@@ -1,15 +1,9 @@
-import { supabase } from "@/lib/supabase";
+import { localDatabase } from "@/lib/localDatabase";
 import { CloudProvider } from "@/types/cloudProvider";
 
 export async function fetchCloudProviders(): Promise<CloudProvider[]> {
   try {
-    const { data, error } = await supabase.from("providers").select("*");
-
-    if (error) {
-      console.error("Error fetching cloud providers:", error);
-      throw error;
-    }
-    return data || [];
+    return await localDatabase.fetchCloudProviders();
   } catch (error) {
     console.error("Failed to fetch cloud providers:", error);
     // Return default providers as fallback

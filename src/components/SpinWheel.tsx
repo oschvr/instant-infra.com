@@ -55,7 +55,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({
         <div
           className={cn(
             "relative mx-auto flex flex-col items-center py-8",
-            className
+            className,
           )}
         >
           {wheelData.length > 0 && (
@@ -92,7 +92,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({
                 "button-shine w-full shadow-md transition-all duration-300 transform",
                 mustSpin || wheelData.length === 0
                   ? "opacity-70 cursor-not-allowed"
-                  : "hover:shadow-lg"
+                  : "hover:shadow-lg",
               )}
               size="lg"
             >

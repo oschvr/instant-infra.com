@@ -18,8 +18,12 @@ import {
 } from "@/components/ui/dialog";
 import { fetchChallenges } from "@/services/challengesService";
 import { CloudProvider } from "@/types/cloudProvider";
+import { Deployment } from "@/types/deployment";
+import { createChallenge } from "@/services/challengesService";
+import { useQueryClient } from "@tanstack/react-query";
 
-const Index = () => {
+const Game = () => {
+  const queryClient = useQueryClient();
   const {
     data: cloudProviders,
     isLoading,
@@ -72,10 +76,30 @@ const Index = () => {
     }, 5000);
   };
 
-  const handleProjectSelect = (projectName: string) => {
-    setSelectedProject(projectName);
+  const handleProjectSelect = async (deployment: Deployment) => {
+    setSelectedProject(deployment.name);
     setShowProjectResult(true);
     setShowProjectConfetti(true);
+
+    // Create a new challenge in the database
+    if (selectedProvider) {
+      try {
+        const newChallenge = await createChallenge(
+          selectedProvider.id,
+          deployment.id,
+        );
+        if (newChallenge) {
+          console.log("New challenge created:", newChallenge);
+          // Optionally refresh the challenges data or update the UI
+          queryClient.invalidateQueries({ queryKey: ["challenges"] });
+          toast.success(
+            `New challenge created: ${deployment.name} on ${selectedProvider.name}!`,
+          );
+        }
+      } catch (error) {
+        console.error("Failed to create challenge:", error);
+      }
+    }
 
     // Hide confetti after 5 seconds
     setTimeout(() => {
@@ -241,7 +265,6 @@ const Index = () => {
               <TabsContent value="tracker" className="mt-8">
                 <ProjectTracker
                   providers={cloudProviders || []}
-                  deployments={deployments || []}
                   challenges={challenges || []}
                 />
               </TabsContent>
@@ -253,4 +276,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Game;
