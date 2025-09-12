@@ -1,34 +1,5 @@
 {
-  "challenges": [
-    {
-      "id": "1",
-      "provider_id": "aws",
-      "deployment_id": "basic-vm",
-      "is_done": false,
-      "created_at": "2024-01-01T00:00:00Z"
-    },
-    {
-      "id": "2",
-      "provider_id": "gcp",
-      "deployment_id": "static-website",
-      "is_done": true,
-      "created_at": "2024-01-02T00:00:00Z"
-    },
-    {
-      "id": "3",
-      "provider_id": "azure",
-      "deployment_id": "database",
-      "is_done": false,
-      "created_at": "2024-01-03T00:00:00Z"
-    },
-    {
-      "id": "4",
-      "provider_id": "aws",
-      "deployment_id": "storage-bucket",
-      "is_done": true,
-      "created_at": "2024-01-03T00:00:00Z"
-    }
-  ],
+  "challenges": [],
   "providers": [
     {
       "id": "aws",
