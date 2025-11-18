@@ -1,5 +1,14 @@
 {
-  "challenges": [],
+  "challenges": [
+    {
+      "id": "1",
+      "provider_id": "aws",
+      "deployment_id": "storage-bucket",
+      "is_done": true,
+      "created_at": "2025-11-18",
+      "video_url": ""
+    }
+  ],
   "providers": [
     {
       "id": "aws",
