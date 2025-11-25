@@ -6,6 +6,22 @@
       "deployment_id": "storage-bucket",
       "is_done": true,
       "created_at": "2025-11-18",
+      "video_url": "https://www.youtube.com/watch?v=68lwRfVMCx4"
+    },
+    {
+      "id": "2",
+      "provider_id": "gcp",
+      "deployment_id": "container-registry",
+      "is_done": true,
+      "created_at": "2025-11-21",
+      "video_url": "https://youtu.be/zI4leMsOHC4"
+    },
+    {
+      "id": "3",
+      "provider_id": "gcp",
+      "deployment_id": "storage-bucket",
+      "is_done": true,
+      "created_at": "2025-11-25",
       "video_url": ""
     }
   ],
@@ -63,10 +79,6 @@
     {
       "id": "argocd",
       "name": "K8S: ArgoCD"
-    },
-    {
-      "id": "ingress-nginx",
-      "name": "K8S: Ingress Nginx"
     },
     {
       "id": "eck-stack",
