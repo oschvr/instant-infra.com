@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import SpinWheel from "@/components/SpinWheel";
 import CloudProviderResult from "@/components/Deployments";
 import ProjectTracker from "@/components/ProjectTracker";
@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchCloudProviders } from "@/services/cloudProviderService";
 import { useQuery } from "@tanstack/react-query";
-import {} from "lucide-react";
 import { fetchDeployments } from "@/services/deploymentsService";
 import ReactConfetti from "react-confetti";
 import {
@@ -45,6 +44,23 @@ const Game = () => {
 
   const [selectedProvider, setSelectedProvider] =
     useState<CloudProvider | null>(null);
+
+  // Filter deployments to exclude already completed challenges for the selected provider
+  const availableDeployments = useMemo(() => {
+    if (!deployments || !challenges || !selectedProvider) {
+      return deployments || [];
+    }
+
+    return deployments.filter((deployment) => {
+      // Check if there's already a challenge with this provider and deployment combination
+      const existingChallenge = challenges.find(
+        (challenge) =>
+          challenge.provider_name === selectedProvider.name &&
+          challenge.deployment_name === deployment.name
+      );
+      return !existingChallenge;
+    });
+  }, [deployments, challenges, selectedProvider]);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("tracker");
   const [showResult, setShowResult] = useState(false);
@@ -64,16 +80,20 @@ const Game = () => {
     setShowResult(true);
     setShowConfetti(true);
 
-    // Hide confetti after 5 seconds
+    // Hide confetti after 2 seconds
     setTimeout(() => {
       setShowConfetti(false);
-    }, 5000);
+    }, 2000);
 
-    // Switch to project tab after 3 seconds
+    // Switch to project tab after 2 seconds
     setTimeout(() => {
       setShowResult(false);
       setActiveTab("project");
-    }, 5000);
+    }, 2000);
+  };
+
+  const handlePlayGame = () => {
+    setActiveTab("provider");
   };
 
   const handleProjectSelect = async (deployment: Deployment) => {
@@ -86,14 +106,14 @@ const Game = () => {
       try {
         const newChallenge = await createChallenge(
           selectedProvider.id,
-          deployment.id,
+          deployment.id
         );
         if (newChallenge) {
           console.log("New challenge created:", newChallenge);
           // Optionally refresh the challenges data or update the UI
           queryClient.invalidateQueries({ queryKey: ["challenges"] });
           toast.success(
-            `New challenge created: ${deployment.name} on ${selectedProvider.name}!`,
+            `New challenge created: ${deployment.name} on ${selectedProvider.name}!`
           );
         }
       } catch (error) {
@@ -101,16 +121,16 @@ const Game = () => {
       }
     }
 
-    // Hide confetti after 5 seconds
+    // Hide confetti after 2 seconds
     setTimeout(() => {
       setShowProjectConfetti(false);
-    }, 5000);
+    }, 2000);
 
-    // Hide dialog and switch to tracker tab after 3 seconds
+    // Hide dialog and switch to tracker tab after 2 seconds
     setTimeout(() => {
       setShowProjectResult(false);
       setActiveTab("tracker");
-    }, 5000);
+    }, 2000);
   };
 
   const containerVariants = {
@@ -254,15 +274,38 @@ const Game = () => {
               </TabsContent>
 
               <TabsContent value="project" className="mt-8">
-                <CloudProviderResult
-                  provider={selectedProvider!}
-                  deployments={deployments || []}
-                  onProjectSelect={handleProjectSelect}
-                  onClickContinue={() => setActiveTab("tracker")}
-                />
+                {availableDeployments.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-2xl font-bold text-muted-foreground mb-4">
+                      🎉 All challenges completed for {selectedProvider?.name}!
+                    </p>
+                    <p className="text-lg text-muted-foreground">
+                      Try spinning for a different cloud provider.
+                    </p>
+                  </div>
+                ) : (
+                  <CloudProviderResult
+                    provider={selectedProvider!}
+                    deployments={availableDeployments}
+                    onProjectSelect={handleProjectSelect}
+                    onClickContinue={() => setActiveTab("tracker")}
+                  />
+                )}
               </TabsContent>
 
               <TabsContent value="tracker" className="mt-8">
+                {(window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") && (
+                  <div className="mb-8 flex justify-center">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handlePlayGame}
+                      className="button-shine text-3xl font-bold px-12 py-6 rounded-xl shadow-xl bg-primary text-primary-foreground hover:shadow-2xl transition-all duration-300"
+                    >
+                      🎮 Play
+                    </motion.button>
+                  </div>
+                )}
                 <ProjectTracker
                   providers={cloudProviders || []}
                   challenges={challenges || []}
