@@ -4,4 +4,5 @@ export interface Challenge {
   deployment_name: string;
   is_done: boolean;
   created_at: string;
+  video_url: string;
 }

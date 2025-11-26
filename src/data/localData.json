@@ -22,7 +22,15 @@
       "deployment_id": "storage-bucket",
       "is_done": true,
       "created_at": "2025-11-25",
-      "video_url": ""
+      "video_url": "https://youtu.be/zga4OWGZjr8"
+    },
+    {
+      "id": "4",
+      "provider_id": "gcp",
+      "deployment_id": "basic-vm",
+      "is_done": true,
+      "created_at": "2025-11-25",
+      "video_url": "https://youtu.be/aTB-PtOAS08"
     }
   ],
   "providers": [

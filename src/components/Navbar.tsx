@@ -29,23 +29,23 @@ export function Navbar() {
           </a>
           <nav className="hidden md:flex items-center gap-6">
             <a
-              href="/game"
+              href="/#/game"
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
             >
               Game
             </a>
             <a
-              href="/about"
+              href="/#/about"
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
             >
               About
             </a>
-            <button
+            {/* <button
               className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
               onClick={handleExportData}
             >
               Export Data
-            </button>
+            </button> */}
           </nav>
         </div>
       </div>

@@ -10,6 +10,7 @@ interface StoredChallenge {
   deployment_id: string;
   is_done: boolean;
   created_at: string;
+  video_url?: string;
 }
 
 interface StoredData {
@@ -45,6 +46,7 @@ export const localDatabase = {
         deployment_name: deployment?.name || "Unknown",
         is_done: challenge.is_done,
         created_at: challenge.created_at,
+        video_url: challenge.video_url || "",
       };
     });
   },
@@ -95,6 +97,7 @@ export const localDatabase = {
       deployment_name: deployment.name,
       is_done: false,
       created_at: new Date().toISOString(),
+      video_url: "",
     };
 
     localData.challenges.push({
@@ -103,6 +106,7 @@ export const localDatabase = {
       deployment_id: deploymentId,
       is_done: false,
       created_at: newChallenge.created_at,
+      video_url: "",
     });
 
     // Save the updated data to localStorage
