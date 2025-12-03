@@ -88,7 +88,8 @@ const About = () => {
                     (Simple VM, Storage bucket, K8s cluster, etc)
                   </li>
                   <li>
-                    Try to create and apply the outcome in less than 15 minutes
+                    Try to create and apply the outcome in less than 15/30
+                    minutes (depending complexity)
                   </li>
                 </ol>
                 <p className="text-muted-foreground">Guides:</p>
@@ -103,6 +104,7 @@ const About = () => {
                   <li>
                     Search, modify or create weird Terraform/OpenTofu providers
                   </li>
+                  <li>Untangle a complex or broken Terraform/OpenTofu state</li>
                   <li>Open to suggestions !</li>
                   <li>¯\_(ツ)_/¯</li>
                 </ul>
